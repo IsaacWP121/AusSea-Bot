@@ -1,2 +1,2 @@
-# Mod-Mail
-Mod Mail Bot for Aus Sea discord
+# AusSea-Bot
+Bot for Aus Sea discord
