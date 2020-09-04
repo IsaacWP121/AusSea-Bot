@@ -8,8 +8,8 @@ async def on_message(message):
 
 	#if the channel is a dm and the author of the message variable is not the bot
 	if isinstance(message.channel, discord.channel.DMChannel) and (message.author != client.user): 
-		await message.channel.send("Hi there! If you need some help, please react to this message so we can get started.") #sends back the same message (for now, it'll send a helpful response message soon)
-	
+		x = await Cmessage.channel.send("Hi there! If you need some help, please react to this message so we can get started.") #sends back the same message (for now, it'll send a helpful response message soon)
+		await x.add_reaction("✅")
 	# if the channel is a dm, the messsage author isn't the bot itself and the message content matches the same str as below (janky but will be moved to a file soon) 
 	elif isinstance(message.channel, discord.channel.DMChannel) and (message.author ==
 		client.user) and (message.content == "Hi there! If you need some help, please react to this message so we can get started."): 
