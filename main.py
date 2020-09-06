@@ -87,7 +87,7 @@ async def on_message(message):
 			await msg.add_reaction(one) #add the reactions to the bot so that the user can select a bot
 			await msg.add_reaction(two)
 			await msg.add_reaction(three)
-			await mgs.add_reaction(four)
+			await msg.add_reaction(four)
 			
 		# when a message has the "one" emoji added
 		elif (reaction.emoji == one):
