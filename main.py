@@ -23,7 +23,7 @@ async def on_connect():
 	userInputMode = False
 	category = 0
 	userMessage = ""
-	categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
+	categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618} #all the different channel id's
 
 @client.event #decorating this fucntion as an event
 async def on_message(message):
@@ -31,7 +31,7 @@ async def on_message(message):
 	global category
 	global userMessage
 
-
+	# if its the cancel command reset the bot's state
 	if isinstance(message.channel, discord.channel.DMChannel) and (message.author != client.user) and "&cancel" in message.content:
 		userInputMode = False
 		category = 0
@@ -50,6 +50,7 @@ async def on_message(message):
 		await message.add_reaction(three)
 		await message.add_reaction(four)
 
+	# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 	elif isinstance(message.channel, discord.channel.DMChannel) and (message.author != client.user) and userInputMode == True and message.content == "&send":
 		guild = client.get_guild(713704403567378473)
 		userMessage = userMessage[:-1]
@@ -60,10 +61,12 @@ async def on_message(message):
 			embed.add_field(name="Message", value='"{}"'.format(userMessage))
 			await channel.send(embed=embed)
 
+	# join the messages and add a newline between them
 	elif isinstance(message.channel, discord.channel.DMChannel) and (message.author != client.user) and userInputMode == True:
 			userMessage = "{}{}\n".format(userMessage, message.content)
 	#
 
+	#this is to make sure the user cant add a second reaction and screw the bot over, itll be called after the user chooses a reaction
 	async def clear_react(message):
 		global one
 		global two
@@ -71,7 +74,7 @@ async def on_message(message):
 		global four
 		lis = [one, two, three, four]
 		for i in lis:
-			await message.remove_reaction(i, client.user)
+			await message.remove_reaction(i, client.user) #cant remove all due to not being able to remove the users
 
 	@client.event
 	async def on_reaction_add(reaction, user):
