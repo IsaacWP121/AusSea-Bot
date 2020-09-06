@@ -121,7 +121,8 @@ async def on_message(message):
 async def on_member_join(member):
 	guild = client.get_guild(179077200149086209)
 	channel = guild.get_channel(179077200149086209)
-	await channel.send("Hi <@{}>, welcome to Aus SEA Brawlhalla! Please checkout #rules and go #set-your-roles, enjoy your stay!".format(member.id))
+	await channel.send("Hi <@{}>, welcome to Aus SEA Brawlhalla! Please checkout #rules and go #set-your-roles, enjoy your stay!\n<:{}:{}>".format(member.id, "AusSEAWave", 752031381613183028))
+
 
 if __name__ == "__main__":
 	client.run("token here")
