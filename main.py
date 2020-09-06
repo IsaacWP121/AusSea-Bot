@@ -15,11 +15,11 @@ async def on_connect():
 	global category
 	global categoryIds
 	global userMessage
-	four = "4⃣"
 	tick = "✅"
 	one = "1⃣"
 	two = "2⃣"
 	three ="3⃣"
+	four = "4⃣"
 	userInputMode = False
 	category = 0
 	userMessage = ""
@@ -31,27 +31,23 @@ async def on_message(message):
 	global category
 	global userMessage
 
+	# if the message is not a dm or if message is from bot, return (Do not proceed)
+	if (not isinstance(message.channel, discord.channel.DMChannel) or message.author == client.user):
+		return
+	
 	# if its the cancel command reset the bot's state
-	if isinstance(message.channel, discord.channel.DMChannel) and (message.author != client.user) and "&cancel" in message.content:
+	if ("&cancel" in message.content):
 		userInputMode = False
 		category = 0
 		userMessage = ""
 
-	#if the channel is a dm and the author of the message variable is not the bot
-	elif isinstance(message.channel, discord.channel.DMChannel) and (message.author != client.user) and userInputMode != True: 
+	#if the message variable is not the bot
+	elif (userInputMode != True): 
 		msg = await message.channel.send("Hi there! If you need some help, please react to this message so we can get started.\nYou can cancel at any time with &cancel") #sends back the same message (for now, it'll send a helpful response message soon)
 		await msg.add_reaction(tick)
 
-	# if the channel is a dm, the messsage author isn't the bot itself and the message content matches the same str as below (janky but will be moved to a file soon) 
-	elif isinstance(message.channel, discord.channel.DMChannel) and (message.author == 
-		client.user) and (message.content == "-----------------\nWhat category would you place your request under?\n\n"+one+" Moderation\n\n"+two+" Tournaments\n\n"+three+" Mentoring\n\n"+four+" Other\n-----------------") and userInputMode != True:
-		await message.add_reaction(one) #add the reactions to the bot so that the user can select a bot
-		await message.add_reaction(two)
-		await message.add_reaction(three)
-		await message.add_reaction(four)
-
 	# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
-	elif isinstance(message.channel, discord.channel.DMChannel) and (message.author != client.user) and userInputMode == True and message.content == "&send":
+	elif (userInputMode == True and message.content == "&send"):
 		guild = client.get_guild(713704403567378473)
 		userMessage = userMessage[:-1]
 		if category != 0:
@@ -62,12 +58,12 @@ async def on_message(message):
 			await channel.send(embed=embed)
 
 	# join the messages and add a newline between them
-	elif isinstance(message.channel, discord.channel.DMChannel) and (message.author != client.user) and userInputMode == True:
-			userMessage = "{}{}\n".format(userMessage, message.content)
+	elif (userInputMode == True):
+		userMessage = "{}{}\n".format(userMessage, message.content)
 	#
 
 	#this is to make sure the user cant add a second reaction and screw the bot over, itll be called after the user chooses a reaction
-	async def clear_react(message):
+		async def clear_react(message):
 		global one
 		global two
 		global three
@@ -80,30 +76,42 @@ async def on_message(message):
 	async def on_reaction_add(reaction, user):
 		global userInputMode
 		global category
-		# when a message has the "tick" emoji added, the user id is not the bot's and the channel is a dm 
-		if reaction.emoji == tick and user != client.user and isinstance(message.channel, discord.channel.DMChannel):
-			await reaction.message.channel.send("-----------------\nWhat category would you place your request under?\n\n"+one+" Moderation\n\n"+two+" Tournaments\n\n"+three+" Mentoring\n\n"+four+" Other\n-----------------")
-
-		# when a message has the "one" emoji added, the user id is not the bot's and the channel is a dm
-		if reaction.emoji == one and user != client.user and isinstance(message.channel, discord.channel.DMChannel):
+		
+		#  If the user id is the bot's or if the channel is not a dm, return
+		if(user == client.user or not isinstance(message.channel, discord.channel.DMChannel)):
+			return		
+		
+		# when a message has the "tick" emoji added
+		if (reaction.emoji == tick):
+			msg = await reaction.message.channel.send("-----------------\nWhat category would you place your request under?\n\n"+one+" Moderation\n\n"+two+" Tournaments\n\n"+three+" Mentoring\n\n"+four+" Other\n-----------------")
+			await msg.add_reaction(one) #add the reactions to the bot so that the user can select a bot
+			await msg.add_reaction(two)
+			await msg.add_reaction(three)
+			await mgs.add_reaction(four)
+			
+		# when a message has the "one" emoji added
+		elif (reaction.emoji == one):
 			await clear_react(reaction.message)
 			await reaction.message.channel.send("Please type your message below and use &send to submit your message to the staff")
 			userInputMode = True
 			category = 1
-		# when a message has the "one" emoji added, the user id is not the bot's and the channel is a dm		
-		if reaction.emoji == two and user != client.user and isinstance(message.channel, discord.channel.DMChannel):
+			
+		# when a message has the "two" emoji added		
+		elif (reaction.emoji == two):
 			await clear_react(reaction.message)
 			await reaction.message.channel.send("Please type your message below and use &send to submit your message to the staff")
 			userInputMode = True
 			category = 2
-		# when a message has the "one" emoji added, the user id is not the bot's and the channel is a dm
-		if reaction.emoji == three and user != client.user and isinstance(message.channel, discord.channel.DMChannel):
+			
+		# when a message has the "three" emoji added
+		elif (reaction.emoji == three):
 			await clear_react(reaction.message)
 			await reaction.message.channel.send("Please type your message below and use &send to submit your message to the staff")
 			userInputMode = True
-			category = 3		
-		# when a message has the "one" emoji added, the user id is not the bot's and the channel is a dm
-		if reaction.emoji == four and user != client.user and isinstance(message.channel, discord.channel.DMChannel):
+			category = 3	
+			
+		# when a message has the "four" emoji added
+		elif (reaction.emoji == four):
 			await clear_react(reaction.message)
 			await reaction.message.channel.send("Please type your message below and use &send to submit your message to the staff")
 			userInputMode = True
