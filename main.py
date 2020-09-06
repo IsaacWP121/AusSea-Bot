@@ -119,10 +119,9 @@ async def on_message(message):
 #when the user joins the server the bot will welcome them
 @client.event
 async def on_member_join(member):
-	guild = client.get_guild(713704403567378473)
+	guild = client.get_guild(179077200149086209)
 	channel = guild.get_channel(179077200149086209)
-	channel.send("Hi <@{}>, welcome to Aus SEA Brawlhalla! Please checkout #rules and go #set-your-roles, enjoy your stay!".format(message.author.id))
-
+	await channel.send("Hi <@{}>, welcome to Aus SEA Brawlhalla! Please checkout #rules and go #set-your-roles, enjoy your stay!".format(member.id))
 
 if __name__ == "__main__":
 	client.run("token here")
