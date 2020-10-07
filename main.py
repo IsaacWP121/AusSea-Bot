@@ -224,4 +224,4 @@ async def on_member_join(member):
 
 
 if __name__ == "__main__"
-	#client.run("NzUyMDI1NTkwMjU2NjMxODY1.X1RoaA.g8KUthmVXasVMED3TflU0Ii6ocQ")
+	#client.run("")
