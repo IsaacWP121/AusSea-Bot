@@ -1,8 +1,9 @@
-import discord
-from discord.ext import commands #imports
+import discord, sqlite3, datetime #imports
+from discord.ext import commands 
 from string import digits
 
 client = commands.Bot(command_prefix = "&", self_bot=False) #initialising client
+conn = sqlite3.connect("blacklists.db")
 
 #this allows me to create embeds in 2 lines instead of 4 or 5
 async def embed(author, Title, Description, Colour=discord.Colour.blue(), fields=[], avatar=True):
@@ -44,6 +45,8 @@ async def on_connect():
 	global eyes
 	global noEntrySign
 	global redCross
+	global TimeoutTime
+	TimeoutTime = None
 	four = "4⃣"
 	tick = "✅"
 	one = "1⃣"
@@ -63,7 +66,7 @@ async def on_message(message):
 	global userInputMode
 	global category
 	global userMessage
-
+	global TimeoutTime
 
 	if ("ethway" in (message.content)) or ("bitcoin" in (message.content)) or ("libra" in (message.content)) or ("btc" in (message.content)) or ("crypto" in (message.content)) and not isinstance(message.channel, discord.channel.DMChannel) and message.guild.id != 713704403567378473:
 		await message.delete()
@@ -71,7 +74,6 @@ async def on_message(message):
 		channel = guild.get_channel(750590527249973369)
 		await channel.send(embed= await embed(message.author, "Posted Scam Link", "Ban or mute as you choose", fields=
 			[{"value": "<@{}>\n{}".format(message.author.id, message.content), "name":"__________"}]))
-
 	# if the message is not a dm or if message is from bot, return (Do not proceed)
 	if (not isinstance(message.channel, discord.channel.DMChannel) or message.author == client.user):
 		return
@@ -83,41 +85,57 @@ async def on_message(message):
 		userMessage = ""
 
 	#if the message variable is not the bot
-	elif (userInputMode != True): 
+	elif (userInputMode != True):
 		msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
 		[{"value":"Hi there! If you need some help, please react to this message so we can get started.\nYou can cancel at any time with &cancel", "name":"____________"}],
-		 avatar=False))
+		 avatar=False)) #sends back the same message (for now, it'll send a helpful response message soon)
 		await msg.add_reaction(tick)
 
-	# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
+		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 	elif (userInputMode == True and message.content == "&send"):
-		guild = client.get_guild(713704403567378473) #get the staff guild
-		userMessage = userMessage[:-1] #removes the new line at the end of the message for formatting purposes
-		if category != 0:
-			channel = guild.get_channel(categoryIds[category]) #gets the proper channel it should be sending to
-			msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
-				message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":'"{}"'.format(userMessage), 
-			"name":"message"}, {"value":"Use the eyes to show the user that their message has been seen\n\nUse the red cross to mark the request as closed\n\nUse the 'no entry sign' emoji to blacklist the user", 
-			"name":"Reactions"}])) #creates a embed (with multiple dicts in the field arg to create multiple text fields)
-			await msg.add_reaction(eyes) #add reactions
-			await msg.add_reaction(redCross)
-			await msg.add_reaction(noEntrySign)
-		await message.channel.send(embed = await embed(message.author, "Submitted", "",
-		 fields=[{"value":"Your message has been sent to the Aus Sea staff, they will help you shortly", "name":"____________"}], avatar=False)) #sends message to the user informing them their message has been sent
-		userInputMode = False #resets the variables
-		category = 0
-		userMessage = ""
+		if datetime.datetime.now() < TimeoutTime:
+			guild = client.get_guild(713704403567378473) #get the staff guild
+			userMessage = userMessage[:-1] #removes the new line at the end of the message for formatting purposes
+			if category != 0:
+				channel = guild.get_channel(categoryIds[category]) #gets the proper channel it should be sending to
+				msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
+					message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":'"{}"'.format(userMessage), 
+				"name":"message"}, {"value":"Use the eyes to show the user that their message has been seen\n\nUse the red cross to mark the request as closed\n\nUse the 'no entry sign' emoji to blacklist the user", 
+				"name":"Reactions"}])) #creates a embed (with multiple dicts in the field arg to create multiple text fields)
+				await msg.add_reaction(eyes) #add reactions
+				await msg.add_reaction(redCross)
+				await msg.add_reaction(noEntrySign)
+			await message.channel.send(embed = await embed(message.author, "Submitted", "",
+			 fields=[{"value":"Your message has been sent to the Aus Sea staff, they will help you shortly", "name":"____________"}], avatar=False)) #sends message to the user informing them their message has been sent
+			userInputMode = False #resets the variables
+			category = 0
+			userMessage = ""
+		else:
+			userInputMode = False #resets the variables
+			category = 0
+			userMessage = ""
+			TimeoutTime = None
+			await message.channel.send(embed = await embed(message.author, "Timeout", "",
+				 fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
 
-	# join the messages and add a newline between them
+		# join the messages and add a newline between them
 	elif (userInputMode == True):
-		userMessage = "{}{}\n".format(userMessage, message.content)
-
+		if datetime.datetime.now() <= TimeoutTime:
+			userMessage = "{}{}\n".format(userMessage, message.content)
+		else:
+			userInputMode = False #resets the variables
+			category = 0
+			userMessage = ""
+			TimeoutTime = None
+			await message.channel.send(embed = await embed(message.author, "Timeout", "",
+				 fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
 
 	@client.event
 	async def on_reaction_add(reaction, user):
 		global userInputMode
 		global category
-		
+		global TimeoutTime
+
 		# if the user is the bot
 		if (user == client.user):
 			return
@@ -157,6 +175,7 @@ async def on_message(message):
 		# when a message has the "one" emoji added
 		elif (reaction.emoji == one):
 			userInputMode = True
+			TimeoutTime = datetime.datetime.now() + datetime.timedelta(hours = 1) 
 			category = 1
 			await clear_react(reaction.message)
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
@@ -167,6 +186,7 @@ async def on_message(message):
 		# when a message has the "two" emoji added		
 		elif (reaction.emoji == two):
 			userInputMode = True
+			TimeoutTime = datetime.datetime.now() + datetime.timedelta(hours = 1) 
 			category = 2
 			await clear_react(reaction.message)
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
@@ -176,6 +196,7 @@ async def on_message(message):
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == three):
 			userInputMode = True
+			TimeoutTime = datetime.datetime.now() + datetime.timedelta(hours = 1)
 			category = 3
 			await clear_react(reaction.message)
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
@@ -185,6 +206,7 @@ async def on_message(message):
 		# when a message has the "four" emoji added
 		elif (reaction.emoji == four):
 			userInputMode = True
+			TimeoutTime = datetime.datetime.now() + datetime.timedelta(hours = 1)
 			category = 4
 			await clear_react(reaction.message)
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
@@ -200,5 +222,7 @@ async def on_member_join(member):
 	await channel.send("Hi <@{}>, welcome to Aus SEA Brawlhalla! Please checkout <#{}> and go <#{}>, enjoy your stay!\n<:{}:{}>".format(
 		member.id, 231799301410390017, 455290609800839178, "AusSEAWave", 752031381613183028))
 
+
 if __name__ == "__main__":
-	client.run("token here")
+	client.run('NzUwNjIzNTgxNjAzNDk1OTM3.X09Orw.3-Pr1n_1PwUuKpJd8fhGNWcLxgs') #real one
+	#client.run("NzUyMDI1NTkwMjU2NjMxODY1.X1RoaA.g8KUthmVXasVMED3TflU0Ii6ocQ")
