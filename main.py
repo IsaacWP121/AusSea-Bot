@@ -223,6 +223,5 @@ async def on_member_join(member):
 		member.id, 231799301410390017, 455290609800839178, "AusSEAWave", 752031381613183028))
 
 
-if __name__ == "__main__":
-	client.run('NzUwNjIzNTgxNjAzNDk1OTM3.X09Orw.3-Pr1n_1PwUuKpJd8fhGNWcLxgs') #real one
+if __name__ == "__main__"
 	#client.run("NzUyMDI1NTkwMjU2NjMxODY1.X1RoaA.g8KUthmVXasVMED3TflU0Ii6ocQ")
