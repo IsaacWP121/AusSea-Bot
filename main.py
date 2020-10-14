@@ -2,6 +2,8 @@ import discord, datetime #imports
 from discord.ext import commands 
 from string import digits
 
+client = commands.Bot(command_prefix = "&", self_bot=False) #initialising client
+
 #this allows me to create embeds in 2 lines instead of 4 or 5
 async def embed(author, Title, Description, Colour=discord.Colour.blue(), fields=[], avatar=True):
 	embed = discord.Embed(colour=discord.Colour.blue(), title=Title, description=Description) #creates the initial embed
