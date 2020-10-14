@@ -220,5 +220,5 @@ async def on_member_join(member):
 		member.id, 231799301410390017, 455290609800839178, "AusSEAWave", 752031381613183028))
 
 
-if __name__ == "__main__"
+if __name__ == "__main__":
 	client.run("")
