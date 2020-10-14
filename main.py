@@ -1,9 +1,6 @@
-import discord, sqlite3, datetime #imports
+import discord, datetime #imports
 from discord.ext import commands 
 from string import digits
-
-client = commands.Bot(command_prefix = "&", self_bot=False) #initialising client
-conn = sqlite3.connect("blacklists.db")
 
 #this allows me to create embeds in 2 lines instead of 4 or 5
 async def embed(author, Title, Description, Colour=discord.Colour.blue(), fields=[], avatar=True):
@@ -24,10 +21,10 @@ async def clear_react(message):
 	for i in lis:
 		await message.remove_reaction(i, client.user) #cant remove all due to not being able to remove the users
 
-
+# this is used to print out in terminal when the bot is ready
 @client.event
 async def on_ready():
-	print("Bot is ready {}".format(client.user))
+	print("{} is ready".format(client.user))
 
 
 @client.event
@@ -224,4 +221,4 @@ async def on_member_join(member):
 
 
 if __name__ == "__main__"
-	#client.run("")
+	client.run("")
