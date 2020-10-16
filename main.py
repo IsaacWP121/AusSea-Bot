@@ -14,7 +14,7 @@ async def embed(author, Title, Description, Colour=discord.Colour.blue(), fields
 	return embed
 
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
-async def clear_react(message):
+async def clear_react(message):#function to reset reactions
 	global one
 	global two
 	global three
