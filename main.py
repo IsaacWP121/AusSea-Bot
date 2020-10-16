@@ -1,4 +1,4 @@
-import discord, datetime #imports
+import discord, datetime, Token #imports
 from discord.ext import commands 
 from string import digits
 
@@ -223,4 +223,4 @@ async def on_member_join(member):
 
 
 if __name__ == "__main__":
-	client.run("NzUwNjIzNTgxNjAzNDk1OTM3.X09Orw.8sOkxuDZrOg8SOZ_hkppzpEq1Rc")
+	client.run(Token.token())
