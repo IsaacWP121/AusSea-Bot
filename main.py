@@ -1,17 +1,10 @@
 import discord, datetime, Token #imports
 from discord.ext import commands 
 from string import digits
+from embed import embed
+from send import Send
 
 client = commands.Bot(command_prefix = "&", self_bot=False) #initialising client
-
-#this allows me to create embeds in 2 lines instead of 4 or 5
-async def embed(author, Title, Description, Colour=discord.Colour.blue(), fields=[], avatar=True):
-	embed = discord.Embed(colour=discord.Colour.blue(), title=Title, description=Description) #creates the initial embed
-	if avatar == True: #if avatars are turned on
-		embed.set_thumbnail(url="{}".format(author.avatar_url)) #then add the author's avatar
-	for i in fields:
-		embed.add_field(name=i["name"], value=i["value"], inline=False) #add the text field below with the values from field
-	return embed
 
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
 async def clear_react(message):#function to reset reactions
@@ -66,13 +59,6 @@ async def on_message(message):
 	global category
 	global userMessage
 	global TimeoutTime
-
-	if ("ethway" in (message.content)) or ("bitcoin" in (message.content)) or ("libra" in (message.content)) or ("btc" in (message.content)) or ("crypto" in (message.content)) and not isinstance(message.channel, discord.channel.DMChannel) and message.guild.id != 713704403567378473:
-		await message.delete()
-		guild = client.get_guild(713704403567378473)
-		channel = guild.get_channel(750590527249973369)
-		await channel.send(embed= await embed(message.author, "Posted Scam Link", "Ban or mute as you choose", fields=
-			[{"value": "<@{}>\n{}".format(message.author.id, message.content), "name":"__________"}]))
 	# if the message is not a dm or if message is from bot, return (Do not proceed)
 	if (not isinstance(message.channel, discord.channel.DMChannel) or message.author == client.user):
 		return
@@ -92,30 +78,7 @@ async def on_message(message):
 
 		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 	elif (userInputMode == True and message.content == "&send"):
-		if datetime.datetime.now() < TimeoutTime:
-			guild = client.get_guild(713704403567378473) #get the staff guild
-			userMessage = userMessage[:-1] #removes the new line at the end of the message for formatting purposes
-			if category != 0:
-				channel = guild.get_channel(categoryIds[category]) #gets the proper channel it should be sending to
-				msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
-					message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":'"{}"'.format(userMessage), 
-				"name":"message"}, {"value":"Use the eyes to show the user that their message has been seen\n\nUse the red cross to mark the request as closed\n\nUse the 'no entry sign' emoji to blacklist the user", 
-				"name":"Reactions"}])) #creates a embed (with multiple dicts in the field arg to create multiple text fields)
-				await msg.add_reaction(eyes) #add reactions
-				await msg.add_reaction(redCross)
-				await msg.add_reaction(noEntrySign)
-			await message.channel.send(embed = await embed(message.author, "Submitted", "",
-			 fields=[{"value":"Your message has been sent to the Aus Sea staff, they will help you shortly", "name":"____________"}], avatar=False)) #sends message to the user informing them their message has been sent
-			userInputMode = False #resets the variables
-			category = 0
-			userMessage = ""
-		else:
-			userInputMode = False #resets the variables
-			category = 0
-			userMessage = ""
-			TimeoutTime = None
-			await message.channel.send(embed = await embed(message.author, "Timeout", "",
-				 fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
+		await Send(client, TimeoutTime, userMessage, category, categoryIds, message)
 
 		# join the messages and add a newline between them
 	elif (userInputMode == True):
