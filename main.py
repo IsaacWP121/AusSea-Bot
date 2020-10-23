@@ -50,6 +50,7 @@ async def on_connect():
 	userInputMode = False
 	category = 0
 	userMessage = ""
+	await AsyncDataBase.create()
 	categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
 
 
@@ -63,6 +64,8 @@ async def on_message(message):
 	if (not isinstance(message.channel, discord.channel.DMChannel) or message.author == client.user):
 		return
 	
+	if (await AsyncDataBase.read("Blacklist", [message.id])):
+		return
 	# if its the cancel command reset the bot's state
 	if ("&cancel" in message.content):
 		userInputMode = False
@@ -118,6 +121,17 @@ async def on_message(message):
 			).send(embed = await embed(message.author, "Update!", "",
 		 fields=[{"value":"Your ticket has been closed by a staff member, have a good day!", "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(redCross)
+		
+		if (reaction.emoji == noEntrySign):
+			await client.get_user(int(
+			''.join(c for c in reaction.message.embeds[0].description if c in digits))).send(embed = 
+			await embed(message.author, "Blacklisted", "",
+		 fields=[{"value":"You have been banned from using this bot, don't waste your time", 
+		 "name":"____________"}], avatar=False))
+			await reaction.message.clear_reaction(redCross)
+			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
+			await AsyncDataBase.update("Blacklist", [USER_ID])
+			
 
 
 		# if the channel is not a dm, return

@@ -4,16 +4,16 @@ from aiosqlite import Error
 async def create():
     try:
         conn = await aiosqlite.connect("data.db")
-        c = conn.cursor()
-        await c.execute('''CREATE TABLE Blacklist
+        c = await conn.cursor()
+        await c.execute('''CREATE TABLE IF NOT EXISTS Blacklist
          (ID INT);''')
-        await c.execute('''CREATE TABLE User_Messages
+        await c.execute('''CREATE TABLE IF NOT EXISTS User_Messages
         (ID INT, MESSAGE TEXT);''')
-        await c.execute('''CREATE TABLE UserInputMode
+        await c.execute('''CREATE TABLE IF NOT EXISTS UserInputMode
         (ID INT, OnOff INT);''')
-        await c.execute('''CREATE TABLE Catogory
+        await c.execute('''CREATE TABLE IF NOT EXISTS Catogory
         (ID INT, Catogory INT);''')
-        await c.execute('''CREATE TABLE Datetime
+        await c.execute('''CREATE TABLE IF NOT EXISTS Datetime
         (ID INT, Datetime INT);''')
         await conn.commit()
     except Error as e:
@@ -38,16 +38,15 @@ async def update(Table, Values):
                 else:
                     _ = "{}, {}".format(_, x)
             Values = _
-        print(_)
     except Error as e:
         print(e)
     try:
         conn = await aiosqlite.connect("data.db")
-        c = conn.cursor()
-        
-        c.execute("INSERT INTO {} VALUES ({})".format(Table, Values))
+        c = await conn.cursor()
+        if Table == "Blacklist":
+            await c.execute("INSERT INTO Blacklist (ID) VALUES ({})".format(Values))
         await conn.commit()
-        print("data has been inputted into Blacklist")
+        print("data has been inputted into {}".format(Table))
 
     except Error as e:
         print(e)
@@ -57,11 +56,12 @@ async def update(Table, Values):
             await conn.close()
     
 async def read(Table, ID):
+    rd = None
     try:
         conn = await aiosqlite.connect("data.db")
-        c = conn.cursor()
-        await c.execute("SELECT * FROM {} WHERE ID={}".format(Table, ID))
-        print(c.fetchall())
+        c = await conn.cursor()
+        await c.execute("SELECT ID FROM {}".format(Table))
+        rd = await c.fetchall()
         await conn.commit()
 
     except Error as e:
@@ -70,6 +70,10 @@ async def read(Table, ID):
     finally:
         if conn:
             await conn.close()
+            if rd == None:
+                return False
+            else:
+                return rd
 
 def remove():
     return
