@@ -91,14 +91,13 @@ async def on_message(message):
 		# join the messages and add a newline between them
 	elif (userInputMode == True):
 		if datetime.datetime.now() <= TimeoutTime:
-			print(message.author.id)
 			_ = await AsyncDataBase.read("User_Messages", message.author.id)
 			if _ == False:
-				print("tes")
-				await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message="{}\n".format(message.content))
+				await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
 			else:
-				print(_)
-				await AsyncDataBase.update("User_Messages", ((_[1], message.author.id)))
+				x = "{} {}".format([x[1] for x in _][0], message.content)
+				print(x)
+				await AsyncDataBase.update("User_Messages", (x, message.author.id))
 		else:
 			userInputMode = False #resets the variables
 			category = 0

@@ -8,7 +8,7 @@ async def create():
         await c.execute('''CREATE TABLE IF NOT EXISTS Blacklist
          (ID INT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS User_Messages
-        (ID INT, MESSAGE TEXT);''')
+        (ID INT, MESSAGE NUMERIC);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS UserInputMode
         (ID INT, OnOff INT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS Catogory
@@ -47,12 +47,11 @@ async def read(Table, ID):
     c = await conn.cursor()
     try:
         if Table == "Blacklist":
-            await c.execute("SELECT * FROM Blacklist WHERE ID=?", [ID])
+            await c.execute("SELECT * FROM Blacklist WHERE ID=?", (ID,))
         if Table == "User_Messages":
-            await c.execute("SELECT * FROM User_Messages WHERE ID=469067687616839691")
+            await c.execute("SELECT * FROM User_Messages WHERE ID=?", (ID,))
 
         rd = await c.fetchall()
-        print(rd)
         await conn.commit()
 
 
@@ -67,12 +66,12 @@ async def read(Table, ID):
             else:
                 return rd
 #Values is equal to message and id
-async def update(Table, Values):
+async def update(Table, ID, Message=None):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
         if Table == "User_Messages":
-            await c.executemany('''UPDATE User_Messages SET MESSAGE = ? WHERE ID = ?''', Values)
+            await c.execute('''UPDATE User_Messages SET MESSAGE = ? WHERE ID = ?''', (Message, ID))
         await conn.commit()
     except Error as e:
         print(e)
@@ -81,11 +80,11 @@ async def update(Table, Values):
         if conn:
             await conn.close()
 
-async def remove(table, id):
+async def remove(Table, ID):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
-        await c.execute("DELETE FROM {} WHERE ID = {}".format(table, id))
+        await c.execute("DELETE FROM {} WHERE ID = {}".format(Table, ID))
         await conn.commit()
 
     except Error as e:
