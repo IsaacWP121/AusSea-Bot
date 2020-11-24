@@ -23,30 +23,16 @@ async def create():
         if conn:
             await conn.close()
 
-async def update(Table, Values):
-    try:
-        _ = ""
-        for x in Values:
-            if _ == "":
-                if isinstance(x, str):
-                    _ = "'{}'".format(x)
-                else:
-                    _ = x
-            else:
-                if isinstance(x, str):
-                    _ = "{}, '{}'".format(_, x)
-                else:
-                    _ = "{}, {}".format(_, x)
-            Values = _
-    except Error as e:
-        print(e)
+async def addEntry(Table, ID, Message=None):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
         if Table == "Blacklist":
-            await c.execute("INSERT INTO Blacklist (ID) VALUES ({})".format(Values))
-        await conn.commit()
+            await c.execute("INSERT INTO Blacklist (ID) VALUES ($1)", (ID))
+        if Table == "User_Messages":
+            print(await c.execute("INSERT INTO User_Messages(ID, MESSAGE) VALUES(?, ?)", (ID, Message)))
         print("data has been inputted into {}".format(Table))
+        await conn.commit()
 
     except Error as e:
         print(e)
@@ -57,11 +43,49 @@ async def update(Table, Values):
     
 async def read(Table, ID):
     rd = None
+    conn = await aiosqlite.connect("data.db")
+    c = await conn.cursor()
+    try:
+        if Table == "Blacklist":
+            await c.execute("SELECT * FROM Blacklist WHERE ID=?", [ID])
+        if Table == "User_Messages":
+            await c.execute("SELECT * FROM User_Messages WHERE ID=469067687616839691")
+
+        rd = await c.fetchall()
+        print(rd)
+        await conn.commit()
+
+
+    except Error as e:
+        print(e)
+
+    finally:
+        if conn:
+            await conn.close()
+            if rd == None or rd == []:
+                return False
+            else:
+                return rd
+#Values is equal to message and id
+async def update(Table, Values):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
-        await c.execute("SELECT ID FROM {}".format(Table))
-        rd = await c.fetchall()
+        if Table == "User_Messages":
+            await c.executemany('''UPDATE User_Messages SET MESSAGE = ? WHERE ID = ?''', Values)
+        await conn.commit()
+    except Error as e:
+        print(e)
+    
+    finally:
+        if conn:
+            await conn.close()
+
+async def remove(table, id):
+    try:
+        conn = await aiosqlite.connect("data.db")
+        c = await conn.cursor()
+        await c.execute("DELETE FROM {} WHERE ID = {}".format(table, id))
         await conn.commit()
 
     except Error as e:
@@ -70,10 +94,3 @@ async def read(Table, ID):
     finally:
         if conn:
             await conn.close()
-            if rd == None:
-                return False
-            else:
-                return rd
-
-def remove():
-    return

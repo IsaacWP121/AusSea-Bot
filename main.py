@@ -33,7 +33,6 @@ async def on_connect():
 	global userInputMode
 	global category
 	global categoryIds
-	global userMessage
 	global eyes
 	global noEntrySign
 	global redCross
@@ -49,7 +48,6 @@ async def on_connect():
 	redCross = 	u"\u274C"
 	userInputMode = False
 	category = 0
-	userMessage = ""
 	await AsyncDataBase.create()
 	categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
 
@@ -58,19 +56,26 @@ async def on_connect():
 async def on_message(message):
 	global userInputMode
 	global category
-	global userMessage
 	global TimeoutTime
 	# if the message is not a dm or if message is from bot, return (Do not proceed)
-	if (not isinstance(message.channel, discord.channel.DMChannel) or message.author == client.user):
+	#Blacklist/Unblacklist someone
+	if (not isinstance(message.channel, discord.channel.DMChannel)):
+		#if message.content == "&blacklist":
+		
+		#if message.content == "&unblacklist":
+
+
 		return
 	
-	if (await AsyncDataBase.read("Blacklist", [message.id])):
+	if message.author == client.user:
+		return
+
+	if (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
 	# if its the cancel command reset the bot's state
-	if ("&cancel" in message.content):
+	if ("&cancel" == message.content):
 		userInputMode = False
 		category = 0
-		userMessage = ""
 
 	#if the message variable is not the bot
 	elif (userInputMode != True):
@@ -86,7 +91,14 @@ async def on_message(message):
 		# join the messages and add a newline between them
 	elif (userInputMode == True):
 		if datetime.datetime.now() <= TimeoutTime:
-			userMessage = "{}{}\n".format(userMessage, message.content)
+			print(message.author.id)
+			_ = await AsyncDataBase.read("User_Messages", message.author.id)
+			if _ == False:
+				print("tes")
+				await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message="{}\n".format(message.content))
+			else:
+				print(_)
+				await AsyncDataBase.update("User_Messages", ((_[1], message.author.id)))
 		else:
 			userInputMode = False #resets the variables
 			category = 0
@@ -104,7 +116,6 @@ async def on_message(message):
 		# if the user is the bot
 		if (user == client.user):
 			return
-
 		# if the emoji is "eyes" it'll grab the description of the embed (the user id of the message the reaction is attached to,
 		# this is done by grabbing the description of the embed, removing everything except the id, then turning it into an integer and using that to get the user)
 		# which it will then send a message to
@@ -123,17 +134,16 @@ async def on_message(message):
 			await reaction.message.clear_reaction(redCross)
 		
 		if (reaction.emoji == noEntrySign):
-			await client.get_user(int(
-			''.join(c for c in reaction.message.embeds[0].description if c in digits))).send(embed = 
-			await embed(message.author, "Blacklisted", "",
-		 fields=[{"value":"You have been banned from using this bot, don't waste your time", 
-		 "name":"____________"}], avatar=False))
-			await reaction.message.clear_reaction(redCross)
-			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
-			await AsyncDataBase.update("Blacklist", [USER_ID])
+			if not (await AsyncDataBase.read("Blacklist", [message.id])):
+				await client.get_user(int(
+				''.join(c for c in reaction.message.embeds[0].description if c in digits))).send(embed = 
+				await embed(message.author, "Blacklisted", "",
+			fields=[{"value":"You have been banned from using this bot, don't waste your time", 
+			"name":"____________"}], avatar=False))
+				await reaction.message.clear_reaction(redCross)
+				USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
+				await AsyncDataBase.addEntry("Blacklist", [USER_ID])
 			
-
-
 		# if the channel is not a dm, return
 		if not isinstance(message.channel, discord.channel.DMChannel):
 			return
