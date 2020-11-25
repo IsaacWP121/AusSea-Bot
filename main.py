@@ -46,7 +46,6 @@ async def on_connect():
 	eyes = u"\U0001F440"
 	noEntrySign = u"\U0001F6AB"
 	redCross = 	u"\u274C"
-	userInputMode = False
 	category = 0
 	await AsyncDataBase.create()
 	categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
@@ -54,7 +53,6 @@ async def on_connect():
 
 @client.event #decorating this function as an event
 async def on_message(message):
-	global userInputMode
 	global category
 	global TimeoutTime
 	# if the message is not a dm or if message is from bot, return (Do not proceed)
@@ -86,7 +84,7 @@ async def on_message(message):
 
 		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 	elif (userInputMode == True and message.content == "&send"):
-		await Send(client, TimeoutTime, userMessage, category, categoryIds, message)
+		await Send(client, TimeoutTime, [x[1] for x in (await AsyncDataBase.read("User_Messages", message.author.id))][0], category, categoryIds, message)
 
 		# join the messages and add a newline between them
 	elif (userInputMode == True):
@@ -97,7 +95,7 @@ async def on_message(message):
 			else:
 				x = "{} {}".format([x[1] for x in _][0], message.content)
 				print(x)
-				await AsyncDataBase.update("User_Messages", (x, message.author.id))
+				await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
 		else:
 			userInputMode = False #resets the variables
 			category = 0

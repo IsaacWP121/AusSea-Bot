@@ -1,6 +1,8 @@
 
 from embed import embed
 import datetime
+from textwrap import wrap
+import AsyncDataBase
 four = "4⃣"
 tick = "✅"
 one = "1⃣"
@@ -12,7 +14,10 @@ redCross = 	u"\u274C"
 async def Send(client, TimeoutTime, userMessage, category, categoryIds, message):
     if datetime.datetime.now() < TimeoutTime:
         guild = client.get_guild(713704403567378473) #get the staff guild
-        userMessage = userMessage[:-1] #removes the new line at the end of the message for formatting purposes
+        _ = wrap(userMessage, 35)
+        x = ""
+        for i in _:
+            x = x + i + "\n"
         if category != 0:
             channel = guild.get_channel(categoryIds[category]) #gets the proper channel it should be sending to
             msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
@@ -24,11 +29,11 @@ async def Send(client, TimeoutTime, userMessage, category, categoryIds, message)
             await msg.add_reaction(noEntrySign)
             await message.channel.send(embed = await embed(message.author, "Submitted", "",
 			 fields=[{"value":"Your message has been sent to the Aus Sea staff, they will help you shortly", "name":"____________"}], avatar=False)) #sends message to the user informing them their message has been sent
-            userInputMode = False #resets the variables
+            await AsyncDataBase.remove("User_Messages", message.author.id) #resets the variables
             category = 0
             userMessage = ""
         else:
-            userInputMode = False #resets the variables
+            await AsyncDataBase.remove("User_Messages", message.author.id) #resets the variables
             category = 0
             userMessage = ""
             TimeoutTime = None

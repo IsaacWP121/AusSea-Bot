@@ -8,9 +8,9 @@ async def create():
         await c.execute('''CREATE TABLE IF NOT EXISTS Blacklist
          (ID INT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS User_Messages
-        (ID INT, MESSAGE NUMERIC);''')
+        (ID INT, MESSAGE TEXT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS UserInputMode
-        (ID INT, OnOff INT);''')
+        (ID INT, OnOff BLOB);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS Catogory
         (ID INT, Catogory INT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS Datetime
@@ -23,14 +23,17 @@ async def create():
         if conn:
             await conn.close()
 
-async def addEntry(Table, ID, Message=None):
+async def addEntry(Table, ID, Message=None, BOOL=None):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
         if Table == "Blacklist":
             await c.execute("INSERT INTO Blacklist (ID) VALUES ($1)", (ID))
         if Table == "User_Messages":
-            print(await c.execute("INSERT INTO User_Messages(ID, MESSAGE) VALUES(?, ?)", (ID, Message)))
+            await c.execute("INSERT INTO User_Messages(ID, MESSAGE) VALUES(?, ?)", (ID, Message))
+        if Table == "UserInputMode":
+            await c.execute("INSERT INTO UserInputMode(ID, OnOff) VALUES(?, ?)", (ID, BOOL))
+
         print("data has been inputted into {}".format(Table))
         await conn.commit()
 
@@ -50,7 +53,8 @@ async def read(Table, ID):
             await c.execute("SELECT * FROM Blacklist WHERE ID=?", (ID,))
         if Table == "User_Messages":
             await c.execute("SELECT * FROM User_Messages WHERE ID=?", (ID,))
-
+        if Table == "UserInputMode":
+            await c.execute("SELECT * FROM UserInputMode WHERE ID=?", (ID,))
         rd = await c.fetchall()
         await conn.commit()
 
@@ -66,12 +70,14 @@ async def read(Table, ID):
             else:
                 return rd
 #Values is equal to message and id
-async def update(Table, ID, Message=None):
+async def update(Table, ID, Message=None, BOOL=None):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
         if Table == "User_Messages":
             await c.execute('''UPDATE User_Messages SET MESSAGE = ? WHERE ID = ?''', (Message, ID))
+        if Table == "UserInputMode":
+            await c.execute('''UPDATE UserInputMode SET OnOff = ? WHERE ID = ?''', (BOOL, ID))
         await conn.commit()
     except Error as e:
         print(e)
@@ -84,7 +90,12 @@ async def remove(Table, ID):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
-        await c.execute("DELETE FROM {} WHERE ID = {}".format(Table, ID))
+        if Table == "UserMessages":
+            await c.execute("DELETE FROM UserMessages WHERE ID = ?", (ID,))
+        if Table == "Blacklist":
+            await c.execute("DELETE FROM Blacklist WHERE ID = ?", (ID,))
+        if Table == "UserInputMode":
+            await c.execute("DELETE FROM UserInputMode WHERE ID = ?", (ID,))
         await conn.commit()
 
     except Error as e:
