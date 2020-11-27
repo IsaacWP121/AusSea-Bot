@@ -28,7 +28,7 @@ async def addEntry(Table, ID, Message=None, BOOL=None):
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
         if Table == "Blacklist":
-            await c.execute("INSERT INTO Blacklist (ID) VALUES ($1)", (ID))
+            await c.execute("INSERT INTO Blacklist (ID) VALUES (?)", (ID,))
         if Table == "User_Messages":
             await c.execute("INSERT INTO User_Messages(ID, MESSAGE) VALUES(?, ?)", (ID, Message))
         if Table == "UserInputMode":
@@ -65,7 +65,7 @@ async def read(Table, ID):
     finally:
         if conn:
             await conn.close()
-            if rd == None or rd == []:
+            if rd == None or rd == [] or rd == "":
                 return False
             else:
                 return rd
@@ -90,8 +90,8 @@ async def remove(Table, ID):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
-        if Table == "UserMessages":
-            await c.execute("DELETE FROM UserMessages WHERE ID = ?", (ID,))
+        if Table == "User_Messages":
+            await c.execute("DELETE FROM User_Messages WHERE ID = ?", (ID,))
         if Table == "Blacklist":
             await c.execute("DELETE FROM Blacklist WHERE ID = ?", (ID,))
         if Table == "UserInputMode":

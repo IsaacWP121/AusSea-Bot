@@ -14,7 +14,7 @@ redCross = 	u"\u274C"
 async def Send(client, TimeoutTime, userMessage, category, categoryIds, message):
     if datetime.datetime.now() < TimeoutTime:
         guild = client.get_guild(713704403567378473) #get the staff guild
-        _ = wrap(userMessage, 35)
+        _ = wrap(userMessage, 1)
         x = ""
         for i in _:
             x = x + i + "\n"

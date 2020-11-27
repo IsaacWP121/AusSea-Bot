@@ -20,6 +20,7 @@ async def clear_react(message):#function to reset reactions
 @client.event
 async def on_ready():
 	print("{} is ready".format(client.user))
+	await AsyncDataBase.create()
 
 
 @client.event
@@ -46,25 +47,39 @@ async def on_connect():
 	eyes = u"\U0001F440"
 	noEntrySign = u"\U0001F6AB"
 	redCross = 	u"\u274C"
+	userInputMode = False
 	category = 0
-	await AsyncDataBase.create()
 	categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
 
 
 @client.event #decorating this function as an event
 async def on_message(message):
+	global userInputMode
 	global category
 	global TimeoutTime
 	# if the message is not a dm or if message is from bot, return (Do not proceed)
 	#Blacklist/Unblacklist someone
+	if message.content == "@Aus SEA Bot":
+		print(1)
+	
+	if message.content == "<@750623581603495937>":
+		print(2)
+
 	if (not isinstance(message.channel, discord.channel.DMChannel)):
-		#if message.content == "&blacklist":
-		
-		#if message.content == "&unblacklist":
+		elif "&blacklist" == message.content.casefold().split()[0]:
+			for i in message.mentions:
+				if await AsyncDataBase.read("Blacklist", i.id) == False:
+					await AsyncDataBase.addEntry("Blacklist", i.id)
 
-
+		elif "&unblacklist" == message.content.casefold().split()[0]:
+			for i in message.mentions:
+				if await AsyncDataBase.read("Blacklist", i.id) != False:
+					await AsyncDataBase.remove("Blacklist", i.id)
+					print(200)
 		return
 	
+	
+
 	if message.author == client.user:
 		return
 
@@ -94,7 +109,6 @@ async def on_message(message):
 				await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
 			else:
 				x = "{} {}".format([x[1] for x in _][0], message.content)
-				print(x)
 				await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
 		else:
 			userInputMode = False #resets the variables
@@ -131,7 +145,7 @@ async def on_message(message):
 			await reaction.message.clear_reaction(redCross)
 		
 		if (reaction.emoji == noEntrySign):
-			if not (await AsyncDataBase.read("Blacklist", [message.id])):
+			if not (await AsyncDataBase.read("Blacklist", message.id)):
 				await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))).send(embed = 
 				await embed(message.author, "Blacklisted", "",
