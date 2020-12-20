@@ -1,8 +1,9 @@
-import discord, datetime, AsyncDataBase, Token #imports
+import discord, datetime, AsyncDataBase #imports
 from discord.ext import commands 
 from string import digits
 from embed import embed
 from send import Send
+from Token import token
 
 client = commands.Bot(command_prefix = "&", self_bot=False) #initialising client
 
@@ -66,7 +67,7 @@ async def on_message(message):
 		print(2)
 
 	if (not isinstance(message.channel, discord.channel.DMChannel)):
-		elif "&blacklist" == message.content.casefold().split()[0]:
+		if "&blacklist" == message.content.casefold().split()[0]:
 			for i in message.mentions:
 				if await AsyncDataBase.read("Blacklist", i.id) == False:
 					await AsyncDataBase.addEntry("Blacklist", i.id)
@@ -221,4 +222,4 @@ async def on_member_join(member):
 
 
 if __name__ == "__main__":
-	client.run(Token.token())
+	client.run(token())
