@@ -5,7 +5,7 @@ from embed import embed
 from send import Send
 from Token import token
 
-client = commands.Bot(command_prefix = "&", self_bot=False) #initialising client
+client = commands.Bot(command_prefix = "&", self_bot=False, intents=discord.Intents.all()) #initializing client
 
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
 async def clear_react(message):#function to reset reactions
@@ -16,6 +16,21 @@ async def clear_react(message):#function to reset reactions
 	lis = [one, two, three, four]
 	for i in lis:
 		await message.remove_reaction(i, client.user) #cant remove all due to not being able to remove the users
+
+@client.command
+async def Blacklist(ctx):
+	print(1)
+	if (not isinstance(ctx.channel, discord.channel.DMChannel)):
+			for i in ctx.mentions:
+				if await AsyncDataBase.read("Blacklist", i.id) == False:
+					await AsyncDataBase.addEntry("Blacklist", i.id)
+
+@client.command
+async def Unnblacklist(ctx):
+	if (not isinstance(ctx.channel, discord.channel.DMChannel)):
+		for i in ctx.mentions:
+				if await AsyncDataBase.read("Blacklist", i.id) != False:
+					await AsyncDataBase.remove("Blacklist", i.id)
 
 # this is used to print out in terminal when the bot is ready
 @client.event
@@ -58,32 +73,13 @@ async def on_message(message):
 	global userInputMode
 	global category
 	global TimeoutTime
-	# if the message is not a dm or if message is from bot, return (Do not proceed)
-	#Blacklist/Unblacklist someone
-	if message.content == "@Aus SEA Bot":
-		print(1)
-	
-	if message.content == "<@750623581603495937>":
-		print(2)
 
-	if (not isinstance(message.channel, discord.channel.DMChannel)):
-		if "&blacklist" == message.content.casefold().split()[0]:
-			for i in message.mentions:
-				if await AsyncDataBase.read("Blacklist", i.id) == False:
-					await AsyncDataBase.addEntry("Blacklist", i.id)
 
-		elif "&unblacklist" == message.content.casefold().split()[0]:
-			for i in message.mentions:
-				if await AsyncDataBase.read("Blacklist", i.id) != False:
-					await AsyncDataBase.remove("Blacklist", i.id)
-					print(200)
-		return
-	
-	
 
 	if message.author == client.user:
 		return
-
+	if not isinstance(message.channel, discord.channel.DMChannel):
+			return
 	if (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
 	# if its the cancel command reset the bot's state
@@ -119,11 +115,12 @@ async def on_message(message):
 			await message.channel.send(embed = await embed(message.author, "Timeout", "",
 				 fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
 
-	@client.event
-	async def on_reaction_add(reaction, user):
+@client.event
+async def on_reaction_add(reaction, user):
 		global userInputMode
 		global category
 		global TimeoutTime
+		message = reaction.message
 
 		# if the user is the bot
 		if (user == client.user):
@@ -135,14 +132,14 @@ async def on_message(message):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			).send(embed = await embed(message.author, "Update!", "",
-		 fields=[{"value":"Your message has been seen by a staff member, they will dm you shortly", "name":"____________"}], avatar=False))
+			fields=[{"value":"Your message has been seen by a staff member, they will dm you shortly", "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(eyes) #makes it so that the staff cant send multiple "seen" messages 
 
 		if (reaction.emoji == redCross):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			).send(embed = await embed(message.author, "Update!", "",
-		 fields=[{"value":"Your ticket has been closed by a staff member, have a good day!", "name":"____________"}], avatar=False))
+			fields=[{"value":"Your ticket has been closed by a staff member, have a good day!", "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(redCross)
 		
 		if (reaction.emoji == noEntrySign):
@@ -153,9 +150,8 @@ async def on_message(message):
 			fields=[{"value":"You have been banned from using this bot, don't waste your time", 
 			"name":"____________"}], avatar=False))
 				await reaction.message.clear_reaction(redCross)
-				USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
-				await AsyncDataBase.addEntry("Blacklist", [USER_ID])
-			
+			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
+			await AsyncDataBase.addEntry("Blacklist", [USER_ID])
 		# if the channel is not a dm, return
 		if not isinstance(message.channel, discord.channel.DMChannel):
 			return
@@ -211,8 +207,6 @@ async def on_message(message):
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
 			
-
-
 @client.event
 async def on_member_join(member):
 	guild = client.get_guild(179077200149086209)
