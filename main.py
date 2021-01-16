@@ -5,7 +5,8 @@ from embed import embed
 from send import Send
 from Token import token
 
-client = commands.Bot(command_prefix = "&", self_bot=False) #initialising client
+discord.Intents.all()
+client = commands.Bot(command_prefix = "&", self_bot=False) #initializing client
 
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
 async def clear_react(message):#function to reset reactions
@@ -58,6 +59,7 @@ async def on_message(message):
 	global userInputMode
 	global category
 	global TimeoutTime
+	print(tick)
 	# if the message is not a dm or if message is from bot, return (Do not proceed)
 	#Blacklist/Unblacklist someone
 	if message.content == "@Aus SEA Bot":
@@ -78,8 +80,6 @@ async def on_message(message):
 					await AsyncDataBase.remove("Blacklist", i.id)
 					print(200)
 		return
-	
-	
 
 	if message.author == client.user:
 		return
@@ -119,12 +119,12 @@ async def on_message(message):
 			await message.channel.send(embed = await embed(message.author, "Timeout", "",
 				 fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
 
-	@client.event
-	async def on_reaction_add(reaction, user):
+@client.event
+async def on_reaction_add(reaction, user):
 		global userInputMode
 		global category
 		global TimeoutTime
-
+		message = reaction.message
 		# if the user is the bot
 		if (user == client.user):
 			return
@@ -135,14 +135,14 @@ async def on_message(message):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			).send(embed = await embed(message.author, "Update!", "",
-		 fields=[{"value":"Your message has been seen by a staff member, they will dm you shortly", "name":"____________"}], avatar=False))
+			fields=[{"value":"Your message has been seen by a staff member, they will dm you shortly", "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(eyes) #makes it so that the staff cant send multiple "seen" messages 
 
 		if (reaction.emoji == redCross):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			).send(embed = await embed(message.author, "Update!", "",
-		 fields=[{"value":"Your ticket has been closed by a staff member, have a good day!", "name":"____________"}], avatar=False))
+			fields=[{"value":"Your ticket has been closed by a staff member, have a good day!", "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(redCross)
 		
 		if (reaction.emoji == noEntrySign):
@@ -153,9 +153,8 @@ async def on_message(message):
 			fields=[{"value":"You have been banned from using this bot, don't waste your time", 
 			"name":"____________"}], avatar=False))
 				await reaction.message.clear_reaction(redCross)
-				USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
-				await AsyncDataBase.addEntry("Blacklist", [USER_ID])
-			
+			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
+			await AsyncDataBase.addEntry("Blacklist", [USER_ID])
 		# if the channel is not a dm, return
 		if not isinstance(message.channel, discord.channel.DMChannel):
 			return
