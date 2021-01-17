@@ -17,7 +17,7 @@ async def clear_react(message):#function to reset reactions
 	for i in lis:
 		await message.remove_reaction(i, client.user) #cant remove all due to not being able to remove the users
 
-@client.command
+@client.command(name="Blacklist")
 async def Blacklist(ctx):
 	print(1)
 	if (not isinstance(ctx.channel, discord.channel.DMChannel)):
@@ -25,7 +25,7 @@ async def Blacklist(ctx):
 				if await AsyncDataBase.read("Blacklist", i.id) == False:
 					await AsyncDataBase.addEntry("Blacklist", i.id)
 
-@client.command
+@client.command(name="Unblacklist")
 async def Unnblacklist(ctx):
 	if (not isinstance(ctx.channel, discord.channel.DMChannel)):
 		for i in ctx.mentions:
