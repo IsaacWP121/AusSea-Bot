@@ -13,8 +13,6 @@ async def create():
         (ID INT, OnOff BLOB);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS Catogory
         (ID INT, Catogory INT);''')
-        await c.execute('''CREATE TABLE IF NOT EXISTS Datetime
-        (ID INT, Datetime INT);''')
         await conn.commit()
     except Error as e:
         print(e)

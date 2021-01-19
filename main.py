@@ -77,7 +77,7 @@ async def on_message(message):
 		return
 	if (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
-	# if its the cancel command reset the bot's state
+	# if its the cancel command reset the bots state
 	if ("&cancel" == message.content):
 		userInputMode = False
 		category = 0
@@ -95,21 +95,22 @@ async def on_message(message):
 
 		# join the messages and add a newline between them
 	elif (userInputMode == True):
-		m = await message.channel.history(limit=1)
-		if divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60)[0] < 10:
-			_ = await AsyncDataBase.read("User_Messages", message.author.id)
-			if _ == False:
-				await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
+		async for m in message.channel.history(limit=1):
+			if not divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60)[0] > 1:
+				_ = await AsyncDataBase.read("User_Messages", message.author.id)
+				if _ == False:
+					await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
+				else:
+					x = "{} {}".format([x[1] for x in _][0], message.content)
+					await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
 			else:
-				x = "{} {}".format([x[1] for x in _][0], message.content)
-				await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
-		else:
-			userInputMode = False #resets the variables
-			category = 0
-			userMessage = ""
-			TimeoutTime = None
-			await message.channel.send(embed = await embed(message.author, "Timeout", "",
-				 fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
+				print(divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60))
+				userInputMode = False #resets the variables
+				category = 0
+				userMessage = ""
+				TimeoutTime = None
+				await message.channel.send(embed = await embed(message.author, "Timeout", "",
+					fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
 
 @client.event
 async def on_reaction_add(reaction, user):
@@ -143,11 +144,11 @@ async def on_reaction_add(reaction, user):
 				await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))).send(embed = 
 				await embed(message.author, "Blacklisted", "",
-			fields=[{"value":"You have been banned from using this bot, don't waste your time", 
+			fields=[{"value":"I've have banned you from using this bot, Ima go get some milk, I'll be back in an hour", 
 			"name":"____________"}], avatar=False))
-				await reaction.message.clear_reaction(redCross)
+				await reaction.message.clear_reaction(noEntrySign)
 			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
-			await AsyncDataBase.addEntry("Blacklist", [USER_ID])
+			await AsyncDataBase.addEntry("Blacklist", USER_ID)
 		# if the channel is not a dm, return
 		if not isinstance(message.channel, discord.channel.DMChannel):
 			return

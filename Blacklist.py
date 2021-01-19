@@ -16,10 +16,23 @@ async def Blacklist(ctx):
                 except:
                     await ctx.channel.send(embed = await embed(ctx.author, "Currently Blacklisted", "",
 			    fields=[{"value":"None currently blacklisted", "name":"____________"}], avatar=False))
+                return
 
         except:
             print("error")
+        try:
+            for i in ctx.mentions:
+                if await AsyncDataBase.read("Blacklist", i.id) == False:
+                    await AsyncDataBase.addEntry("Blacklist", i.id)
+                    _ = "<@{}>".format(i.id)
+                    await ctx.channel.send(embed = await embed(ctx.author, "Added", "",
+                        fields=[{"value":_ + " Has been added to the blacklist", "name":"____________"}], avatar=False))
+                    return
+        except:
+            print*("error")
 
-        for i in ctx.mentions:
-            if await AsyncDataBase.read("Blacklist", i.id) == False:
-                await AsyncDataBase.addEntry("Blacklist", i.id)
+        try:
+            await ctx.channel.send(embed = await embed(ctx.author, "The fuck", "",
+                fields=[{"value":"Life is hard, try using &blacklist list or &blacklist <user>", "name":"____________"}], avatar=False))
+        except:
+            print("error")

@@ -1,3 +1,7 @@
 {
-    "python.pythonPath": "c:\\Users\\L0m\\3D Objects\\Programming\\AusSea-Bot\\venv\\Scripts\\python.exe"
+    "python.pythonPath": "c:\\Users\\L0m\\3D Objects\\Programming\\AusSea-Bot\\venv\\Scripts\\python.exe",
+    "cSpell.words": [
+        "Unblacklist",
+        "aiosqlite"
+    ]
 }
