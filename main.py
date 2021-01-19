@@ -1,5 +1,7 @@
 import discord, datetime, AsyncDataBase #imports
-from discord.ext import commands 
+from discord.ext import commands
+from Blacklist import Blacklist
+from Unblacklist import Unblacklist
 from string import digits
 from embed import embed
 from send import Send
@@ -16,21 +18,6 @@ async def clear_react(message):#function to reset reactions
 	lis = [one, two, three, four]
 	for i in lis:
 		await message.remove_reaction(i, client.user) #cant remove all due to not being able to remove the users
-
-@client.command(name="Blacklist")
-async def Blacklist(ctx):
-	print(1)
-	if (not isinstance(ctx.channel, discord.channel.DMChannel)):
-			for i in ctx.mentions:
-				if await AsyncDataBase.read("Blacklist", i.id) == False:
-					await AsyncDataBase.addEntry("Blacklist", i.id)
-
-@client.command(name="Unblacklist")
-async def Unnblacklist(ctx):
-	if (not isinstance(ctx.channel, discord.channel.DMChannel)):
-		for i in ctx.mentions:
-				if await AsyncDataBase.read("Blacklist", i.id) != False:
-					await AsyncDataBase.remove("Blacklist", i.id)
 
 # this is used to print out in terminal when the bot is ready
 @client.event
@@ -78,8 +65,16 @@ async def on_message(message):
 
 	if message.author == client.user:
 		return
+
 	if not isinstance(message.channel, discord.channel.DMChannel):
+		try:
+			if message.content.split()[0].lower() == "&blacklist":
+				await Blacklist(message)
+			elif message.content.split()[0].lower() == "&unblacklist":
+				await Unblacklist(message)
+		except:
 			return
+		return
 	if (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
 	# if its the cancel command reset the bot's state
@@ -100,7 +95,8 @@ async def on_message(message):
 
 		# join the messages and add a newline between them
 	elif (userInputMode == True):
-		if datetime.datetime.now() <= TimeoutTime:
+		m = await message.channel.history(limit=1)
+		if divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60)[0] < 10:
 			_ = await AsyncDataBase.read("User_Messages", message.author.id)
 			if _ == False:
 				await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)

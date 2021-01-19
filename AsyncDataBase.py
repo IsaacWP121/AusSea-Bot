@@ -43,7 +43,33 @@ async def addEntry(Table, ID, Message=None, BOOL=None):
     finally:
         if conn:
             await conn.close()
-    
+
+async def readall(Table):
+    rd = None
+    conn = await aiosqlite.connect("data.db")
+    c = await conn.cursor()
+    try:
+        if Table == "Blacklist":
+            await c.execute("SELECT * FROM Blacklist")
+        if Table == "User_Messages":
+            await c.execute("SELECT * FROM User_Messages")
+        if Table == "UserInputMode":
+            await c.execute("SELECT * FROM UserInputMode")
+        rd = await c.fetchall()
+        await conn.commit()
+
+
+    except Error as e:
+        print(e)
+
+    finally:
+        if conn:
+            await conn.close()
+            if rd == None or rd == [] or rd == "":
+                return False
+            else:
+                return rd
+
 async def read(Table, ID):
     rd = None
     conn = await aiosqlite.connect("data.db")
