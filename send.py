@@ -3,16 +3,13 @@ from embed import embed
 import datetime
 from textwrap import wrap
 import AsyncDataBase
-four = "4⃣"
-tick = "✅"
-one = "1⃣"
-two = "2⃣"
-three ="3⃣"
 eyes = u"\U0001F440"
 noEntrySign = u"\U0001F6AB"
 redCross = 	u"\u274C"
 async def Send(client, userMessage, category, categoryIds, message):
     guild = client.get_guild(713704403567378473) #get the staff guild
+    category = await AsyncDataBase.read("Category", message.author.id)
+    print(category)
     _ = wrap(userMessage, 1)
     x = ""
     for i in _:
@@ -31,9 +28,3 @@ async def Send(client, userMessage, category, categoryIds, message):
         await AsyncDataBase.remove("User_Messages", message.author.id) #resets the variables
         category = 0
         userMessage = ""
-    else:
-        await AsyncDataBase.remove("User_Messages", message.author.id) #resets the variables
-        category = 0
-        userMessage = ""
-        await message.channel.send(embed = await embed(message.author, "Timeout", "",
-                fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))

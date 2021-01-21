@@ -11,8 +11,8 @@ async def create():
         (ID INT, MESSAGE TEXT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS UserInputMode
         (ID INT, OnOff BLOB);''')
-        await c.execute('''CREATE TABLE IF NOT EXISTS Catogory
-        (ID INT, Catogory INT);''')
+        await c.execute('''CREATE TABLE IF NOT EXISTS Category
+        (ID INT, Category INT);''')
         await conn.commit()
     except Error as e:
         print(e)
@@ -21,7 +21,7 @@ async def create():
         if conn:
             await conn.close()
 
-async def addEntry(Table, ID, Message=None, BOOL=None):
+async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
@@ -31,7 +31,8 @@ async def addEntry(Table, ID, Message=None, BOOL=None):
             await c.execute("INSERT INTO User_Messages(ID, MESSAGE) VALUES(?, ?)", (ID, Message))
         if Table == "UserInputMode":
             await c.execute("INSERT INTO UserInputMode(ID, OnOff) VALUES(?, ?)", (ID, BOOL))
-
+        if Table == "Category":
+            await c.execute("INSERT INTO Category(ID, Category) VALUES(?, ?)", (ID, CAT))
         print("data has been inputted into {}".format(Table))
         await conn.commit()
 
@@ -79,6 +80,8 @@ async def read(Table, ID):
             await c.execute("SELECT * FROM User_Messages WHERE ID=?", (ID,))
         if Table == "UserInputMode":
             await c.execute("SELECT * FROM UserInputMode WHERE ID=?", (ID,))
+        if Table == "UserInputMode":
+            await c.execute("SELECT * FROM Category WHERE ID=?", (ID,))
         rd = await c.fetchall()
         await conn.commit()
 
@@ -120,6 +123,8 @@ async def remove(Table, ID):
             await c.execute("DELETE FROM Blacklist WHERE ID = ?", (ID,))
         if Table == "UserInputMode":
             await c.execute("DELETE FROM UserInputMode WHERE ID = ?", (ID,))
+        if Table == "Category":
+            await c.execute("DELETE FROM Category WHERE ID = ?", (ID,))
         await conn.commit()
 
     except Error as e:

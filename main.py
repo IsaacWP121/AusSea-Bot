@@ -6,8 +6,22 @@ from string import digits
 from embed import embed
 from send import Send
 from Token import token
+from reset import reset
 
 client = commands.Bot(command_prefix = "&", self_bot=False, intents=discord.Intents.all()) #initializing client
+#declarations
+tick = "✅"
+one = "1⃣"
+two = "2⃣"
+three ="3⃣"
+four = "4⃣"
+eyes = u"\U0001F440"
+noEntrySign = u"\U0001F6AB"
+redCross = 	u"\u274C"
+userInputMode = False
+category = 0
+categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
+
 
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
 async def clear_react(message):#function to reset reactions
@@ -24,20 +38,6 @@ async def clear_react(message):#function to reset reactions
 async def on_ready():
 	print("{} is ready".format(client.user))
 	await AsyncDataBase.create()
-
-
-Timeouttime = 10
-tick = "✅"
-one = "1⃣"
-two = "2⃣"
-three ="3⃣"
-four = "4⃣"
-eyes = u"\U0001F440"
-noEntrySign = u"\U0001F6AB"
-redCross = 	u"\u274C"
-userInputMode = False
-category = 0
-categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
 
 
 @client.event #decorating this function as an event
@@ -61,8 +61,7 @@ async def on_message(message):
 		return
 	# if its the cancel command reset the bots state
 	if ("&cancel" == message.content):
-		userInputMode = False
-		category = 0
+		reset(message.author)
 
 	#if the message variable is not the bot
 	elif (userInputMode != True):
@@ -80,7 +79,7 @@ async def on_message(message):
 		#run for every object in the message.channel.history dataset (with that pulling from the last two messages, 
 		# the first of which will always be the message just sent by the user)
 		async for m in message.channel.history(limit=2):
-			if not round((datetime.datetime.utcnow()-m.created_at).total_seconds()/60) > Timeouttime: #round the timedelta between the current utc time and the time of the last sent message to minutes
+			if not round((datetime.datetime.utcnow()-m.created_at).total_seconds()/60) > 10: #round the timedelta between the current utc time and the time of the last sent message to minutes
 				# if that is not over 10 min run the code
 				_ = await AsyncDataBase.read("User_Messages", message.author.id)
 				if _ == False:
@@ -89,16 +88,11 @@ async def on_message(message):
 					x = "{} {}".format([x[1] for x in _][0], message.content)
 					await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
 			
-			elif divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60)[0] == 0: # this is to return during the first iteration of the for loop (due to the time being the same for both the current time and the time of the message because its the same message)
-				return
-
 			else: #else runs this code
 				userInputMode = False #resets the variables
-				category = 0
-				userMessage = ""
 				await message.channel.send(embed = await embed(message.author, "Timeout", "",
 					fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
-
+				reset(message.author)
 @client.event
 async def on_reaction_add(reaction, user):
 		global userInputMode
@@ -152,7 +146,7 @@ async def on_reaction_add(reaction, user):
 		# when a message has the "one" emoji added
 		elif (reaction.emoji == one):
 			userInputMode = True
-			category = 1
+			await AsyncDataBase.addEntry("Category", user.id, CAT=1)
 			await clear_react(reaction.message)
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
@@ -162,7 +156,7 @@ async def on_reaction_add(reaction, user):
 		# when a message has the "two" emoji added		
 		elif (reaction.emoji == two):
 			userInputMode = True
-			category = 2
+			await AsyncDataBase.addEntry("Category", user.id, CAT=2)
 			await clear_react(reaction.message)
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
@@ -171,7 +165,7 @@ async def on_reaction_add(reaction, user):
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == three):
 			userInputMode = True
-			category = 3
+			await AsyncDataBase.addEntry("Category", user.id, CAT=3)
 			await clear_react(reaction.message)
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
@@ -180,7 +174,7 @@ async def on_reaction_add(reaction, user):
 		# when a message has the "four" emoji added
 		elif (reaction.emoji == four):
 			userInputMode = True
-			category = 4
+			await AsyncDataBase.addEntry("Category", user.id, CAT=4)
 			await clear_react(reaction.message)
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
