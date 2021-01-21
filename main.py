@@ -95,16 +95,19 @@ async def on_message(message):
 
 		# join the messages and add a newline between them
 	elif (userInputMode == True):
-		async for m in message.channel.history(limit=1):
-			if not divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60)[0] > 1:
+		async for m in message.channel.history(limit=2):
+			if not round((datetime.datetime.utcnow()-m.created_at).total_seconds()/60) > 10:
 				_ = await AsyncDataBase.read("User_Messages", message.author.id)
 				if _ == False:
 					await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
 				else:
 					x = "{} {}".format([x[1] for x in _][0], message.content)
 					await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
+			
+			elif divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60)[0] == 0:
+				return
+
 			else:
-				print(divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60))
 				userInputMode = False #resets the variables
 				category = 0
 				userMessage = ""
