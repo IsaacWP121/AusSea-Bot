@@ -95,8 +95,11 @@ async def on_message(message):
 
 		# join the messages and add a newline between them
 	elif (userInputMode == True):
+		#run for every object in the message.channel.history dataset (with that pulling from the last two messages, 
+		# the first of which will always be the message just sent by the user)
 		async for m in message.channel.history(limit=2):
-			if not round((datetime.datetime.utcnow()-m.created_at).total_seconds()/60) > 10:
+			if not round((datetime.datetime.utcnow()-m.created_at).total_seconds()/60) > 10: #round the timedelta between the current utc time and the time of the last sent message to minutes
+				# if that is not over 10 min run the code
 				_ = await AsyncDataBase.read("User_Messages", message.author.id)
 				if _ == False:
 					await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
@@ -104,10 +107,10 @@ async def on_message(message):
 					x = "{} {}".format([x[1] for x in _][0], message.content)
 					await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
 			
-			elif divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60)[0] == 0:
+			elif divmod((datetime.datetime.utcnow()-m.created_at).total_seconds(), 60)[0] == 0: # this is to return during the first iteration of the for loop (due to the time being the same for both the current time and the time of the message because its the same message)
 				return
 
-			else:
+			else: #else runs this code
 				userInputMode = False #resets the variables
 				category = 0
 				userMessage = ""
