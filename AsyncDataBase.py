@@ -80,11 +80,11 @@ async def read(Table, ID):
             await c.execute("SELECT * FROM User_Messages WHERE ID=?", (ID,))
         if Table == "UserInputMode":
             await c.execute("SELECT * FROM UserInputMode WHERE ID=?", (ID,))
-        if Table == "UserInputMode":
+        if Table == "Category":
             await c.execute("SELECT * FROM Category WHERE ID=?", (ID,))
-        rd = await c.fetchall()
+        rd = await c.fetchall()    
         await conn.commit()
-
+        
 
     except Error as e:
         print(e)

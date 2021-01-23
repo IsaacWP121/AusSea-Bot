@@ -9,6 +9,7 @@ from Token import token
 from reset import reset
 
 client = commands.Bot(command_prefix = "&", self_bot=False, intents=discord.Intents.all()) #initializing client
+activity = discord.Game(name="Brawlhalla")
 #declarations
 tick = "✅"
 one = "1⃣"
@@ -60,8 +61,8 @@ async def on_message(message):
 	if (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
 	# if its the cancel command reset the bots state
-	if ("&cancel" == message.content):
-		reset(message.author)
+	if ("&cancel" == message.content.lower()):
+		await reset(message.author)
 
 	#if the message variable is not the bot
 	elif (userInputMode != True):
@@ -70,29 +71,32 @@ async def on_message(message):
 		 avatar=False)) #sends back the same message (for now, it'll send a helpful response message soon)
 		await msg.add_reaction(tick)
 
-		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
-	elif (userInputMode == True and message.content == "&send"):
-		await Send(client, [x[1] for x in (await AsyncDataBase.read("User_Messages", message.author.id))][0], category, categoryIds, message)
-
 		# join the messages and add a newline between them
 	elif (userInputMode == True):
+		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
+		if message.content.lower() == "&send":
+			_ = await AsyncDataBase.read("User_Messages", message.author.id)		
+			await Send(client, category, categoryIds, message)
+			return
+
 		#run for every object in the message.channel.history dataset (with that pulling from the last two messages, 
 		# the first of which will always be the message just sent by the user)
 		async for m in message.channel.history(limit=2):
-			if not round((datetime.datetime.utcnow()-m.created_at).total_seconds()/60) > 10: #round the timedelta between the current utc time and the time of the last sent message to minutes
-				# if that is not over 10 min run the code
-				_ = await AsyncDataBase.read("User_Messages", message.author.id)
-				if _ == False:
-					await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
-				else:
-					x = "{} {}".format([x[1] for x in _][0], message.content)
-					await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
-			
-			else: #else runs this code
-				userInputMode = False #resets the variables
-				await message.channel.send(embed = await embed(message.author, "Timeout", "",
-					fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
-				reset(message.author)
+			if m != message:
+				if not round((datetime.datetime.utcnow()-m.created_at).total_seconds()/60) > 10: #round the timedelta between the current utc time and the time of the last sent message to minutes
+					# if that is not over 10 min run the code
+					_ = await AsyncDataBase.read("User_Messages", message.author.id) 
+					if _ == False:
+						await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
+					else:
+						x = "{} {}".format([x[1] for x in _][0], message.content)
+						await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
+				
+				else: #else runs this code
+					userInputMode = False #resets the variables
+					await message.channel.send(embed = await embed(message.author, "Timeout", "",
+						fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
+					await reset(message.author)
 @client.event
 async def on_reaction_add(reaction, user):
 		global userInputMode
@@ -124,7 +128,7 @@ async def on_reaction_add(reaction, user):
 				await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))).send(embed = 
 				await embed(message.author, "Blacklisted", "",
-			fields=[{"value":"I've have banned you from using this bot, Ima go get some milk, I'll be back in an hour", 
+			fields=[{"value":"I have banned you from using this bot, Ima go get some milk, I'll be back in an hour", 
 			"name":"____________"}], avatar=False))
 				await reaction.message.clear_reaction(noEntrySign)
 			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
