@@ -30,7 +30,7 @@ async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
         if Table == "User_Messages":
             await c.execute("INSERT INTO User_Messages(ID, MESSAGE) VALUES(?, ?)", (ID, Message))
         if Table == "UserInputMode":
-            await c.execute("INSERT INTO UserInputMode(ID, OnOff) VALUES(?, ?)", (ID, BOOL))
+            await c.execute("INSERT OR REPLACE INTO UserInputMode(ID, OnOff) VALUES(?, ?)", (ID, BOOL))
         if Table == "Category":
             await c.execute("INSERT INTO Category(ID, Category) VALUES(?, ?)", (ID, CAT))
         print("data has been inputted into {}".format(Table))
