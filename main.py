@@ -10,6 +10,7 @@ from reset import reset
 
 client = commands.Bot(command_prefix = "&", self_bot=False, intents=discord.Intents.all()) #initializing client
 activity = discord.Activity(name="Jason get banned", type=discord.ActivityType.watching)
+
 #declarations
 tick = "✅"
 one = "1⃣"
@@ -72,8 +73,12 @@ async def on_message(message):
 	elif ((await AsyncDataBase.read("UserInputMode", message.author.id))[0][1] == 1):
 		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 		if message.content.lower() == "&send":
-			await Send(client, categoryIds, message)
-			return
+			if await Send(client, categoryIds, message):
+				await message.channel.send(embed = await embed(message.author, "Message Not Sent", "",
+						fields=[{"value":"Message not sent: Max character limit is ", "name":"____________"}], avatar=False))
+				await reset(message.author)
+			else:
+				await Send(client, categoryIds, message)
 
 		#run for every object in the message.channel.history dataset (with that pulling from the last two messages, 
 		# the first of which will always be the message just sent by the user)
@@ -105,7 +110,7 @@ async def on_reaction_add(reaction, user):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			).send(embed = await embed(reaction.message.author, "Update!", "",
-			fields=[{"value":"Your message has been seen by a staff member, they will dm you shortly", "name":"____________"}], avatar=False))
+			fields=[{"value":"Your message has been seen by <@{}>, they will dm you shortly".format(user.id), "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(eyes) #makes it so that the staff cant send multiple "seen" messages 
 
 		if (reaction.emoji == redCross):
@@ -141,48 +146,46 @@ async def on_reaction_add(reaction, user):
 			
 		# when a message has the "one" emoji added
 		elif (reaction.emoji == one):
+			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
+				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
+				"name":"____________"}], avatar=False))
 			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
 			await AsyncDataBase.addEntry("Category", user.id, CAT=1)
 			await clear_react(reaction.message)
+
+		# when a message has the "two" emoji added		
+		elif (reaction.emoji == two):
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
-
-			
-		# when a message has the "two" emoji added		
-		elif (reaction.emoji == two):
 			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
 			await AsyncDataBase.addEntry("Category", user.id, CAT=2)
 			await clear_react(reaction.message)
+						
+		# when a message has the "three" emoji added
+		elif (reaction.emoji == three):
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
-			
-		# when a message has the "three" emoji added
-		elif (reaction.emoji == three):
 			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
 			await AsyncDataBase.addEntry("Category", user.id, CAT=3)
 			await clear_react(reaction.message)
-			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
-				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
-				"name":"____________"}], avatar=False))
-				
+							
 		# when a message has the "four" emoji added
 		elif (reaction.emoji == four):
-			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
-			await AsyncDataBase.addEntry("Category", user.id, CAT=4)
-			await clear_react(reaction.message)
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
-			
+			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+			await AsyncDataBase.addEntry("Category", user.id, CAT=4)
+			await clear_react(reaction.message)			
+
 @client.event
 async def on_member_join(member):
 	guild = client.get_guild(179077200149086209)
 	channel = guild.get_channel(179077200149086209)
 	await channel.send("Hi <@{}>, welcome to Aus SEA Brawlhalla! Please checkout <#{}> and go <#{}>, enjoy your stay!\n<:{}:{}>".format(
 		member.id, 231799301410390017, 455290609800839178, "AusSEAWave", 752031381613183028))
-
 
 if __name__ == "__main__":
 	client.run(token())

@@ -12,11 +12,9 @@ async def Send(client, categoryIds, message):
     userMessage = await AsyncDataBase.read("User_Messages", 786320320276856872)
     userMessage = userMessage[0][1]
     category = await AsyncDataBase.read("Category", 786320320276856872)
-    _ = wrap(userMessage, 1)
-    x = ""
-    for i in _:
-        x = x + i + "\n"
     if category != 0:
+        if len(userMessage) == 200:
+            return True
         channel = guild.get_channel(categoryIds[category[0][1]]) #gets the proper channel it should be sending to
         msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
             message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":'"{}"'.format(userMessage), 
