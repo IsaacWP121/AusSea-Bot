@@ -9,12 +9,8 @@ from Token import token
 from reset import reset
 
 client = commands.Bot(command_prefix = "&", self_bot=False, intents=discord.Intents.all()) #initializing client
-<<<<<<< HEAD
 activity = discord.Activity(name="Jason get banned", type=discord.ActivityType.watching)
 
-=======
-activity = discord.Game(name="Brawlhalla")
->>>>>>> parent of 5e59361... new
 #declarations
 tick = "✅"
 one = "1⃣"
@@ -80,18 +76,9 @@ async def on_message(message):
 	elif (userInputMode == True):
 		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 		if message.content.lower() == "&send":
-<<<<<<< HEAD
-			if await Send(client, categoryIds, message):
-				await message.channel.send(embed = await embed(message.author, "Message Not Sent", "",
-						fields=[{"value":"Message not sent: Max character limit is ", "name":"____________"}], avatar=False))
-				await reset(message.author)
-			else:
-				await Send(client, categoryIds, message)
-=======
 			_ = await AsyncDataBase.read("User_Messages", message.author.id)		
 			await Send(client, category, categoryIds, message)
 			return
->>>>>>> parent of 5e59361... new
 
 		#run for every object in the message.channel.history dataset (with that pulling from the last two messages, 
 		# the first of which will always be the message just sent by the user)
@@ -126,13 +113,8 @@ async def on_reaction_add(reaction, user):
 		if (reaction.emoji == eyes):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
-<<<<<<< HEAD
-			).send(embed = await embed(reaction.message.author, "Update!", "",
-			fields=[{"value":"Your message has been seen by <@{}>, they will dm you shortly".format(user.id), "name":"____________"}], avatar=False))
-=======
 			).send(embed = await embed(message.author, "Update!", "",
-			fields=[{"value":"Your message has been seen by a staff member, they will dm you shortly", "name":"____________"}], avatar=False))
->>>>>>> parent of 5e59361... new
+			fields=[{"value":"Your message has been seen by <#{}>, they will dm you shortly".format(user.id), "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(eyes) #makes it so that the staff cant send multiple "seen" messages 
 
 		if (reaction.emoji == redCross):
@@ -168,12 +150,9 @@ async def on_reaction_add(reaction, user):
 			
 		# when a message has the "one" emoji added
 		elif (reaction.emoji == one):
-<<<<<<< HEAD
-=======
 			userInputMode = True
 			await AsyncDataBase.addEntry("Category", user.id, CAT=1)
 			await clear_react(reaction.message)
->>>>>>> parent of 5e59361... new
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
@@ -183,14 +162,7 @@ async def on_reaction_add(reaction, user):
 
 		# when a message has the "two" emoji added		
 		elif (reaction.emoji == two):
-<<<<<<< HEAD
-			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
-				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
-				"name":"____________"}], avatar=False))
-			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
-=======
 			userInputMode = True
->>>>>>> parent of 5e59361... new
 			await AsyncDataBase.addEntry("Category", user.id, CAT=2)
 			await clear_react(reaction.message)
 						
@@ -199,25 +171,18 @@ async def on_reaction_add(reaction, user):
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
-<<<<<<< HEAD
-			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
-=======
 			
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == three):
 			userInputMode = True
->>>>>>> parent of 5e59361... new
 			await AsyncDataBase.addEntry("Category", user.id, CAT=3)
 			await clear_react(reaction.message)
 							
 		# when a message has the "four" emoji added
 		elif (reaction.emoji == four):
-<<<<<<< HEAD
-=======
 			userInputMode = True
 			await AsyncDataBase.addEntry("Category", user.id, CAT=4)
 			await clear_react(reaction.message)
->>>>>>> parent of 5e59361... new
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
