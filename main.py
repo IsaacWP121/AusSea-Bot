@@ -1,16 +1,20 @@
 import discord, datetime, AsyncDataBase #imports
 from discord.ext import commands
-from string import digits
 from Blacklist import Blacklist
 from Unblacklist import Unblacklist
+from string import digits
 from embed import embed
 from send import Send
 from Token import token
 from reset import reset
 
 client = commands.Bot(command_prefix = "&", self_bot=False, intents=discord.Intents.all()) #initializing client
+<<<<<<< HEAD
 activity = discord.Activity(name="Jason get banned", type=discord.ActivityType.watching)
 
+=======
+activity = discord.Game(name="Brawlhalla")
+>>>>>>> parent of 5e59361... new
 #declarations
 tick = "✅"
 one = "1⃣"
@@ -20,6 +24,8 @@ four = "4⃣"
 eyes = u"\U0001F440"
 noEntrySign = u"\U0001F6AB"
 redCross = 	u"\u274C"
+userInputMode = False
+category = 0
 categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
 
 
@@ -36,17 +42,19 @@ async def clear_react(message):#function to reset reactions
 # this is used to print out in terminal when the bot is ready
 @client.event
 async def on_ready():
-	await client.change_presence(activity=activity)
 	print("{} is ready".format(client.user))
 	await AsyncDataBase.create()
 
 
 @client.event #decorating this function as an event
 async def on_message(message):
+	global userInputMode
+	global category
+
 	if message.author == client.user:
 		return
 
-	elif not isinstance(message.channel, discord.channel.DMChannel):
+	if not isinstance(message.channel, discord.channel.DMChannel):
 		try:
 			if message.content.split()[0].lower() == "&blacklist":
 				await Blacklist(message)
@@ -55,30 +63,35 @@ async def on_message(message):
 		except:
 			return
 		return
-	elif (await AsyncDataBase.read("Blacklist", message.author.id)):
+	if (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
-
 	# if its the cancel command reset the bots state
-	elif ("&cancel" == message.content.lower()):
+	if ("&cancel" == message.content.lower()):
 		await reset(message.author)
 
 	#if the message variable is not the bot
-	elif ((await AsyncDataBase.read("UserInputMode", message.author.id)) == False):
+	elif (userInputMode != True):
 		msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
 		[{"value":"Hi there! If you need some help, please react to this message so we can get started.\nYou can cancel at any time with &cancel", "name":"____________"}],
 		 avatar=False)) #sends back the same message (for now, it'll send a helpful response message soon)
 		await msg.add_reaction(tick)
 
 		# join the messages and add a newline between them
-	elif ((await AsyncDataBase.read("UserInputMode", message.author.id))[0][1] == 1):
+	elif (userInputMode == True):
 		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 		if message.content.lower() == "&send":
+<<<<<<< HEAD
 			if await Send(client, categoryIds, message):
 				await message.channel.send(embed = await embed(message.author, "Message Not Sent", "",
 						fields=[{"value":"Message not sent: Max character limit is ", "name":"____________"}], avatar=False))
 				await reset(message.author)
 			else:
 				await Send(client, categoryIds, message)
+=======
+			_ = await AsyncDataBase.read("User_Messages", message.author.id)		
+			await Send(client, category, categoryIds, message)
+			return
+>>>>>>> parent of 5e59361... new
 
 		#run for every object in the message.channel.history dataset (with that pulling from the last two messages, 
 		# the first of which will always be the message just sent by the user)
@@ -94,12 +107,16 @@ async def on_message(message):
 						await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
 				
 				else: #else runs this code
-					#resets the variables
+					userInputMode = False #resets the variables
 					await message.channel.send(embed = await embed(message.author, "Timeout", "",
 						fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
 					await reset(message.author)
 @client.event
 async def on_reaction_add(reaction, user):
+		global userInputMode
+		global category
+		message = reaction.message
+
 		# if the user is the bot
 		if (user == client.user):
 			return
@@ -109,29 +126,34 @@ async def on_reaction_add(reaction, user):
 		if (reaction.emoji == eyes):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
+<<<<<<< HEAD
 			).send(embed = await embed(reaction.message.author, "Update!", "",
 			fields=[{"value":"Your message has been seen by <@{}>, they will dm you shortly".format(user.id), "name":"____________"}], avatar=False))
+=======
+			).send(embed = await embed(message.author, "Update!", "",
+			fields=[{"value":"Your message has been seen by a staff member, they will dm you shortly", "name":"____________"}], avatar=False))
+>>>>>>> parent of 5e59361... new
 			await reaction.message.clear_reaction(eyes) #makes it so that the staff cant send multiple "seen" messages 
 
 		if (reaction.emoji == redCross):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
-			).send(embed = await embed(reaction.message.author, "Update!", "",
+			).send(embed = await embed(message.author, "Update!", "",
 			fields=[{"value":"Your ticket has been closed by a staff member, have a good day!", "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(redCross)
 		
 		if (reaction.emoji == noEntrySign):
-			if not (await AsyncDataBase.read("Blacklist", reaction.message.id)):
+			if not (await AsyncDataBase.read("Blacklist", message.id)):
 				await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))).send(embed = 
-				await embed(reaction.message.author, "Blacklisted", "",
+				await embed(message.author, "Blacklisted", "",
 			fields=[{"value":"I have banned you from using this bot, Ima go get some milk, I'll be back in an hour", 
 			"name":"____________"}], avatar=False))
 				await reaction.message.clear_reaction(noEntrySign)
 			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			await AsyncDataBase.addEntry("Blacklist", USER_ID)
 		# if the channel is not a dm, return
-		if not isinstance(reaction.message.channel, discord.channel.DMChannel):
+		if not isinstance(message.channel, discord.channel.DMChannel):
 			return
 		
 		# when a message has the "tick" emoji added
@@ -146,6 +168,12 @@ async def on_reaction_add(reaction, user):
 			
 		# when a message has the "one" emoji added
 		elif (reaction.emoji == one):
+<<<<<<< HEAD
+=======
+			userInputMode = True
+			await AsyncDataBase.addEntry("Category", user.id, CAT=1)
+			await clear_react(reaction.message)
+>>>>>>> parent of 5e59361... new
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
@@ -155,10 +183,14 @@ async def on_reaction_add(reaction, user):
 
 		# when a message has the "two" emoji added		
 		elif (reaction.emoji == two):
+<<<<<<< HEAD
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
 			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+=======
+			userInputMode = True
+>>>>>>> parent of 5e59361... new
 			await AsyncDataBase.addEntry("Category", user.id, CAT=2)
 			await clear_react(reaction.message)
 						
@@ -167,12 +199,25 @@ async def on_reaction_add(reaction, user):
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
+<<<<<<< HEAD
 			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+=======
+			
+		# when a message has the "three" emoji added
+		elif (reaction.emoji == three):
+			userInputMode = True
+>>>>>>> parent of 5e59361... new
 			await AsyncDataBase.addEntry("Category", user.id, CAT=3)
 			await clear_react(reaction.message)
 							
 		# when a message has the "four" emoji added
 		elif (reaction.emoji == four):
+<<<<<<< HEAD
+=======
+			userInputMode = True
+			await AsyncDataBase.addEntry("Category", user.id, CAT=4)
+			await clear_react(reaction.message)
+>>>>>>> parent of 5e59361... new
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))

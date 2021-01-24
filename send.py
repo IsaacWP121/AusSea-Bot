@@ -7,7 +7,7 @@ from reset import reset
 eyes = u"\U0001F440"
 noEntrySign = u"\U0001F6AB"
 redCross = 	u"\u274C"
-async def Send(client, categoryIds, message):
+async def Send(client, category, categoryIds, message):
     guild = client.get_guild(713704403567378473) #get the staff guild
     userMessage = await AsyncDataBase.read("User_Messages", 786320320276856872)
     userMessage = userMessage[0][1]

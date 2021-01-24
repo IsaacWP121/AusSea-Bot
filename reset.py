@@ -8,7 +8,7 @@ async def reset(user):
         await AsyncDataBase.remove("User_Messages", user.id)
     except:
         print("Error with removing from User_Messages reset.py")
-    try:
+    try:    
         await AsyncDataBase.remove("UserInputMode", user.id)
     except:
         print("Error with removing from UserInputMode reset.py")
