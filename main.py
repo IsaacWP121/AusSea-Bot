@@ -76,7 +76,7 @@ async def on_message(message):
 	elif (userInputMode == True):
 		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 		if message.content.lower() == "&send":
-			_ = await AsyncDataBase.read("User_Messages", message.author.id)		
+			_ = await AsyncDataBase.read("User_Messages", message.author.id)
 			await Send(client, category, categoryIds, message)
 			return
 

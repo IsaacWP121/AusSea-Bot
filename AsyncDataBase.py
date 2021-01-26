@@ -45,9 +45,10 @@ async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
 
 async def readall(Table):
     rd = None
-    conn = await aiosqlite.connect("data.db")
-    c = await conn.cursor()
+    
     try:
+        conn = await aiosqlite.connect("data.db")
+        c = await conn.cursor()
         if Table == "Blacklist":
             await c.execute("SELECT * FROM Blacklist")
         if Table == "User_Messages":
@@ -71,9 +72,9 @@ async def readall(Table):
 
 async def read(Table, ID):
     rd = None
-    conn = await aiosqlite.connect("data.db")
-    c = await conn.cursor()
     try:
+        conn = await aiosqlite.connect("data.db")
+        c = await conn.cursor()
         if Table == "Blacklist":
             await c.execute("SELECT * FROM Blacklist WHERE ID=?", (ID,))
         if Table == "User_Messages":
@@ -82,7 +83,7 @@ async def read(Table, ID):
             await c.execute("SELECT * FROM UserInputMode WHERE ID=?", (ID,))
         if Table == "Category":
             await c.execute("SELECT * FROM Category WHERE ID=?", (ID,))
-        rd = await c.fetchall()    
+        rd = await c.fetchall()
         await conn.commit()
         
 
