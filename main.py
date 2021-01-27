@@ -40,6 +40,7 @@ async def clear_react(message):#function to reset reactions
 async def on_ready():
 	print("{} is ready".format(client.user))
 	await AsyncDataBase.create()
+	await client.change_presence(activity=activity)
 
 
 @client.event #decorating this function as an event
@@ -92,7 +93,7 @@ async def on_message(message):
 					if _ == False:
 						await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
 					else:
-						x = "{} {}".format([x for x in _][0], message.content)
+						x = "{} {}".format(_, message.content)
 						await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
 				
 				else: #else runs this code
@@ -116,14 +117,14 @@ async def on_reaction_add(reaction, user):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			).send(embed = await embed(message.author, "Update!", "",
-			fields=[{"value":"Your message has been seen by <#{}>, they will dm you shortly".format(user.id), "name":"____________"}], avatar=False))
+			fields=[{"value":"Your message has been seen by <@{}>, they will dm you shortly".format(user.id), "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(eyes) #makes it so that the staff cant send multiple "seen" messages 
 
 		if (reaction.emoji == redCross):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			).send(embed = await embed(message.author, "Update!", "",
-			fields=[{"value":"Your ticket has been closed by a staff member, have a good day!", "name":"____________"}], avatar=False))
+			fields=[{"value":"Your ticket has been closed by a staff member, hope we helped!", "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(redCross)
 		
 		if (reaction.emoji == noEntrySign):
@@ -152,7 +153,6 @@ async def on_reaction_add(reaction, user):
 			
 		# when a message has the "one" emoji added
 		elif (reaction.emoji == one):
-			userInputMode = True
 			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
 			await AsyncDataBase.addEntry("Category", user.id, CAT=1)
 			await clear_react(reaction.message)
@@ -164,7 +164,6 @@ async def on_reaction_add(reaction, user):
 
 		# when a message has the "two" emoji added		
 		elif (reaction.emoji == two):
-			userInputMode = True
 			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
 			await AsyncDataBase.addEntry("Category", user.id, CAT=2)
 			await clear_react(reaction.message)
@@ -187,7 +186,6 @@ async def on_reaction_add(reaction, user):
 			
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == four):
-			userInputMode = True
 			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
 			await AsyncDataBase.addEntry("Category", user.id, CAT=4)
 			await clear_react(reaction.message)
