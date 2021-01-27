@@ -96,7 +96,7 @@ async def read(Table, ID):
             if rd == None or rd == [] or rd == "":
                 return False
             else:
-                return rd
+                return rd[0][1]
 #Values is equal to message and id
 async def update(Table, ID, Message=None, BOOL=None):
     try:

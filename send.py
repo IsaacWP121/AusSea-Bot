@@ -10,12 +10,16 @@ redCross = 	u"\u274C"
 async def Send(client, category, categoryIds, message):
     guild = client.get_guild(713704403567378473) #get the staff guild
     userMessage = await AsyncDataBase.read("User_Messages", 786320320276856872)
-    userMessage = userMessage[0][1]
+    try:
+        userMessage = userMessage[0][1]
+    except:
+        if userMessage == False:
+            return
     category = await AsyncDataBase.read("Category", 786320320276856872)
     if category != 0:
         if len(userMessage) == 200:
             return True
-        channel = guild.get_channel(categoryIds[category[0][1]]) #gets the proper channel it should be sending to
+        channel = guild.get_channel(categoryIds[category]) #gets the proper channel it should be sending to
         msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
             message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":'"{}"'.format(userMessage), 
             "name":"message"}, {"value":"Use the eyes to show the user that their message has been seen\n\nUse the red cross to mark the request as closed\n\nUse the 'no entry sign' emoji to blacklist the user", 
