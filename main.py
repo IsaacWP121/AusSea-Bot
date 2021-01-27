@@ -70,10 +70,15 @@ async def on_message(message):
 	#if the message variable is not the bot
 	
 	if (await AsyncDataBase.read("UserInputMode", message.author.id) != 1):
-		msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
-			[{"value":"Hi there! If you need some help, please react to this message so we can get started.\nYou can cancel at any time with &cancel", "name":"____________"}],
-			avatar=False)) #sends back the same message (for now, it'll send a helpful response message soon)
-		await msg.add_reaction(tick)
+		if (datetime.datetime.utcnow() - message.author.created_at) < datetime.timedelta(days=7):
+			msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
+				[{"value":"Hi there! If you need some help, please react to this message so we can get started.\nYou can cancel at any time with &cancel", "name":"____________"}],
+				avatar=False)) #sends back the same message (for now, it'll send a helpful response message soon)
+			await msg.add_reaction(tick)
+		else:
+			msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
+				[{"value":"Hi there! I see your account is less then 1 week old. Try again in a little bit", "name":"____________"}],
+				avatar=False)) #sends back the same message (for now, it'll send a helpful response message soon)
 
 	# join the messages and add a newline between them
 	if (await AsyncDataBase.read("UserInputMode", message.author.id) == 1):
