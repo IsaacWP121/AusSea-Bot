@@ -27,10 +27,6 @@ categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429,
 
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
 async def clear_react(message):#function to reset reactions
-	global one
-	global two
-	global three
-	global four
 	lis = [one, two, three, four]
 	for i in lis:
 		await message.remove_reaction(i, client.user) #cant remove all due to not being able to remove the users
@@ -45,9 +41,6 @@ async def on_ready():
 
 @client.event #decorating this function as an event
 async def on_message(message):
-	global userInputMode
-	global category
-
 	if message.author == client.user:
 		return
 
@@ -70,7 +63,8 @@ async def on_message(message):
 	#if the message variable is not the bot
 	
 	if (await AsyncDataBase.read("UserInputMode", message.author.id) != 1):
-		if (datetime.datetime.utcnow() - message.author.created_at) < datetime.timedelta(days=7):
+		print(datetime.datetime.utcnow() - message.author.created_at)
+		if (datetime.datetime.utcnow() - message.author.created_at) > datetime.timedelta(days=7):
 			msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
 				[{"value":"Hi there! If you need some help, please react to this message so we can get started.\nYou can cancel at any time with &cancel", "name":"____________"}],
 				avatar=False)) #sends back the same message (for now, it'll send a helpful response message soon)
@@ -108,10 +102,6 @@ async def on_message(message):
 					await reset(message.author)
 @client.event
 async def on_reaction_add(reaction, user):
-		global userInputMode
-		global category
-		message = reaction.message
-
 		# if the user is the bot
 		if (user == client.user):
 			return
@@ -121,29 +111,29 @@ async def on_reaction_add(reaction, user):
 		if (reaction.emoji == eyes):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
-			).send(embed = await embed(message.author, "Update!", "",
+			).send(embed = await embed(reaction.message.author, "Update!", "",
 			fields=[{"value":"Your message has been seen by <@{}>, they will dm you shortly".format(user.id), "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(eyes) #makes it so that the staff cant send multiple "seen" messages 
 
 		if (reaction.emoji == redCross):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))
-			).send(embed = await embed(message.author, "Update!", "",
+			).send(embed = await embed(reaction.message.author, "Update!", "",
 			fields=[{"value":"Your ticket has been closed by a staff member, hope we helped!", "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(redCross)
 		
 		if (reaction.emoji == noEntrySign):
-			if not (await AsyncDataBase.read("Blacklist", message.id)):
+			if not (await AsyncDataBase.read("Blacklist", reaction.message.id)):
 				await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if c in digits))).send(embed = 
-				await embed(message.author, "Blacklisted", "",
+				await embed(reaction.message.author, "Blacklisted", "",
 			fields=[{"value":"I have banned you from using this bot, Ima go get some milk, I'll be back in an hour", 
 			"name":"____________"}], avatar=False))
 				await reaction.message.clear_reaction(noEntrySign)
 			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			await AsyncDataBase.addEntry("Blacklist", USER_ID)
 		# if the channel is not a dm, return
-		if not isinstance(message.channel, discord.channel.DMChannel):
+		if not isinstance(reaction.message.channel, discord.channel.DMChannel):
 			return
 		
 		# when a message has the "tick" emoji added
