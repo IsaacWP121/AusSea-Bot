@@ -1,4 +1,6 @@
 import discord, datetime, AsyncDataBase #imports
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from pytz import utc
 from discord.ext import commands
 from Blacklist import Blacklist
 from Unblacklist import Unblacklist
@@ -10,8 +12,10 @@ from reset import reset
 
 client = commands.Bot(command_prefix = "&", self_bot=False, intents=discord.Intents.all()) #initializing client
 activity = discord.Activity(name="Jason get banned", type=discord.ActivityType.watching)
+scheduler = AsyncIOScheduler(timezone=utc)
 
 #declarations
+offline = False
 tick = "✅"
 one = "1⃣"
 two = "2⃣"
@@ -24,6 +28,13 @@ userInputMode = False
 category = 0
 categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
 
+async def offline_mode_on():
+	global offline
+	offline = True
+
+async def offline_mode_off():
+	global offline
+	offline = False
 
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
 async def clear_react(message):#function to reset reactions
@@ -37,6 +48,9 @@ async def on_ready():
 	print("{} is ready".format(client.user))
 	await AsyncDataBase.create()
 	await client.change_presence(activity=activity)
+	scheduler.add_job(offline_mode_on, "cron", hour="11")
+	scheduler.add_job(offline_mode_off, "cron", hour="13")
+	scheduler.start()
 
 
 @client.event #decorating this function as an event
@@ -53,17 +67,19 @@ async def on_message(message):
 		except:
 			return
 		return
-	
+
 	if (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
+
+	if offline:
+		return
+
 	# if its the cancel command reset the bots state
 	if ("&cancel" == message.content.lower()):
 		await reset(message.author)
 	
 	#if the message variable is not the bot
-	
 	if (await AsyncDataBase.read("UserInputMode", message.author.id) != 1):
-		print(datetime.datetime.utcnow() - message.author.created_at)
 		if (datetime.datetime.utcnow() - message.author.created_at) > datetime.timedelta(days=7):
 			msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
 				[{"value":"Hi there! If you need some help, please react to this message so we can get started.\nYou can cancel at any time with &cancel", "name":"____________"}],
