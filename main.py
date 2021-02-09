@@ -30,10 +30,12 @@ categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429,
 
 async def offline_mode_on():
 	global offline
+	activity = discord.Activity(name="Mod Mail Is Offline", type=discord.ActivityType.watching)
 	offline = True
 
 async def offline_mode_off():
 	global offline
+	activity = discord.Activity(name="Mod Mail Is Online", type=discord.ActivityType.watching)
 	offline = False
 
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
@@ -72,6 +74,9 @@ async def on_message(message):
 		return
 
 	if offline:
+		msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
+				[{"value":"Hi there! The mod mail functions are temporarily disabled in order to make sure our staff get a bit of a break. Message us back in {} hours and we'll help you out then!".format("?"), "name":"____________"}],
+				avatar=False))
 		return
 
 	# if its the cancel command reset the bots state
@@ -140,11 +145,7 @@ async def on_reaction_add(reaction, user):
 		
 		if (reaction.emoji == noEntrySign):
 			if not (await AsyncDataBase.read("Blacklist", reaction.message.id)):
-				await client.get_user(int(
-				''.join(c for c in reaction.message.embeds[0].description if c in digits))).send(embed = 
-				await embed(reaction.message.author, "Blacklisted", "",
-			fields=[{"value":"I have banned you from using this bot, Ima go get some milk, I'll be back in an hour", 
-			"name":"____________"}], avatar=False))
+				await Blacklist(reaction.message, client, int(''.join(c for c in reaction.message.embeds[0].description if c in digits)))
 				await reaction.message.clear_reaction(noEntrySign)
 			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if c in digits))
 			await AsyncDataBase.addEntry("Blacklist", USER_ID)
@@ -170,8 +171,6 @@ async def on_reaction_add(reaction, user):
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
-			await AsyncDataBase.addEntry("Category", user.id, CAT=1)
-			await clear_react(reaction.message)
 
 		# when a message has the "two" emoji added		
 		elif (reaction.emoji == two):
@@ -181,8 +180,6 @@ async def on_reaction_add(reaction, user):
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
-			await AsyncDataBase.addEntry("Category", user.id, CAT=2)
-			await clear_react(reaction.message)
 						
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == three):
@@ -192,8 +189,6 @@ async def on_reaction_add(reaction, user):
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
-			await AsyncDataBase.addEntry("Category", user.id, CAT=3)
-			await clear_react(reaction.message)
 			
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == four):
@@ -203,8 +198,6 @@ async def on_reaction_add(reaction, user):
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
-			await AsyncDataBase.addEntry("Category", user.id, CAT=4)
-			await clear_react(reaction.message)
 
 @client.event
 async def on_member_join(member):

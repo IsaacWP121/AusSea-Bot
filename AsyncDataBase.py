@@ -96,7 +96,10 @@ async def read(Table, ID):
             if rd == None or rd == [] or rd == "":
                 return False
             else:
-                return rd[0][1]
+                try:
+                    return rd[0][1]
+                except:
+                    return rd[0][0]
 #Values is equal to message and id
 async def update(Table, ID, Message=None, BOOL=None):
     try:

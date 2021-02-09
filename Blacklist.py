@@ -1,7 +1,7 @@
 import discord
 import AsyncDataBase
 from embed import embed
-async def Blacklist(ctx):
+async def Blacklist(ctx, client=None, id=None):
     if (not isinstance(ctx.channel, discord.channel.DMChannel)):
         try:
             if ctx.content.split()[1].lower() == "list":
@@ -20,6 +20,19 @@ async def Blacklist(ctx):
 
         except:
             print("error")
+
+        try:
+            if id != None:
+                await client.get_user(id).send(embed = 
+				await embed(ctx.author, "Blacklisted", "",
+			fields=[{"value":"I have banned you from using this bot, Ima go get some milk, I'll be back in an hour", 
+			"name":"____________"}], avatar=False))
+                _ = "<@{}>".format(id)
+                await ctx.channel.send(embed = await embed(ctx.author, "Added", "",
+                    fields=[{"value":_ + " Has been added to the blacklist", "name":"____________"}], avatar=False))
+                return
+        except:
+            print("error")
         try:
             for i in ctx.mentions:
                 if await AsyncDataBase.read("Blacklist", i.id) == False:
@@ -29,7 +42,8 @@ async def Blacklist(ctx):
                         fields=[{"value":_ + " Has been added to the blacklist", "name":"____________"}], avatar=False))
                     return
         except:
-            print*("error")
+            print("error")
+
 
         try:
             await ctx.channel.send(embed = await embed(ctx.author, "The fuck", "",
