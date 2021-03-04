@@ -50,8 +50,8 @@ async def on_ready():
 	print("{} is ready".format(client.user))
 	await AsyncDataBase.create()
 	await client.change_presence(activity=activity)
-	scheduler.add_job(offline_mode_on, "cron", hour="11")
-	scheduler.add_job(offline_mode_off, "cron", hour="13")
+	scheduler.add_job(lambda:offline_mode_on(), "cron", hour="11")
+	scheduler.add_job(lambda:offline_mode_off(), "cron", hour="13")
 	scheduler.start()
 
 
@@ -60,7 +60,7 @@ async def on_message(message):
 	if message.author == client.user:
 		return
 
-	if not isinstance(message.channel, discord.channel.DMChannel):
+	elif not isinstance(message.channel, discord.channel.DMChannel):
 		try:
 			if message.content.split()[0].lower() == "&blacklist":
 				await Blacklist(message)
@@ -70,21 +70,21 @@ async def on_message(message):
 			return
 		return
 
-	if (await AsyncDataBase.read("Blacklist", message.author.id)):
+	elif (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
 
-	if offline:
+	elif offline:
 		msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
 				[{"value":"Hi there! The mod mail functions are temporarily disabled in order to make sure our staff get a bit of a break. Message us back in {} hours and we'll help you out then!".format("?"), "name":"____________"}],
 				avatar=False))
 		return
 
 	# if its the cancel command reset the bots state
-	if ("&cancel" == message.content.lower()):
+	elif ("&cancel" == message.content.lower()):
 		await reset(message.author)
 	
 	#if the message variable is not the bot
-	if (await AsyncDataBase.read("UserInputMode", message.author.id) != 1):
+	elif (await AsyncDataBase.read("UserInputMode", message.author.id) != 1):
 		if (datetime.datetime.utcnow() - message.author.created_at) > datetime.timedelta(days=7):
 			msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
 				[{"value":"Hi there! If you need some help, please react to this message so we can get started.\nYou can cancel at any time with &cancel", "name":"____________"}],
@@ -96,7 +96,7 @@ async def on_message(message):
 				avatar=False)) #sends back the same message (for now, it'll send a helpful response message soon)
 
 	# join the messages and add a newline between them
-	if (await AsyncDataBase.read("UserInputMode", message.author.id) == 1):
+	elif (await AsyncDataBase.read("UserInputMode", message.author.id) == 1):
 		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 		if message.content.lower() == "&send":
 			_ = await AsyncDataBase.read("User_Messages", message.author.id)
@@ -108,19 +108,14 @@ async def on_message(message):
 		async for m in message.channel.history(limit=2):
 			if m != message:
 				if not round((datetime.datetime.utcnow()-m.created_at).total_seconds()/60) > 10: #round the timedelta between the current utc time and the time of the last sent message to minutes
-					# if that is not over 10 min run the code
-					_ = await AsyncDataBase.read("User_Messages", message.author.id) 
-					if _ == False:
-						await AsyncDataBase.addEntry("User_Messages", (message.author.id), Message=message.content)
-					else:
-						x = "{} {}".format(_, message.content)
-						await AsyncDataBase.update("User_Messages", message.author.id, Message=x)
-				
+					return
+
 				else: #else runs this code
 					userInputMode = False #resets the variables
 					await message.channel.send(embed = await embed(message.author, "Timeout", "",
 						fields=[{"value":"You waited too long to finish your request, please try again", "name":"____________"}], avatar=False))
 					await reset(message.author)
+
 @client.event
 async def on_reaction_add(reaction, user):
 		# if the user is the bot
