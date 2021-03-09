@@ -21,6 +21,7 @@ one = "1⃣"
 two = "2⃣"
 three ="3⃣"
 four = "4⃣"
+time = None
 eyes = u"\U0001F440"
 noEntrySign = u"\U0001F6AB"
 redCross = 	u"\u274C"
@@ -54,9 +55,9 @@ async def on_ready():
 	scheduler.add_job(lambda:offline_mode_off(), "cron", hour="13")
 	scheduler.start()
 
-
 @client.event #decorating this function as an event
 async def on_message(message):
+	global time
 	if message.author == client.user:
 		return
 
@@ -90,6 +91,7 @@ async def on_message(message):
 				[{"value":"Hi there! If you need some help, please react to this message so we can get started.\nYou can cancel at any time with &cancel", "name":"____________"}],
 				avatar=False)) #sends back the same message (for now, it'll send a helpful response message soon)
 			await msg.add_reaction(tick)
+			time = msg.created_at
 		else:
 			msg = await message.channel.send(embed = await embed(message.author, "Hey!", "", fields=
 				[{"value":"Hi there! I see your account is less then 1 week old. Try again in a little bit", "name":"____________"}],
@@ -100,7 +102,7 @@ async def on_message(message):
 		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 		if message.content.lower() == "&send":
 			_ = await AsyncDataBase.read("User_Messages", message.author.id)
-			await Send(client, category, categoryIds, message)
+			await Send(client, category, categoryIds, message, time)
 			return
 
 		#run for every object in the message.channel.history dataset (with that pulling from the last two messages, 
