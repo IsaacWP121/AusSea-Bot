@@ -33,11 +33,13 @@ async def offline_mode_on():
 	global offline
 	activity = discord.Activity(name="Mod Mail Is Offline", type=discord.ActivityType.watching)
 	offline = True
+	await client.change_presence(activity=activity)
 
 async def offline_mode_off():
 	global offline
 	activity = discord.Activity(name="Mod Mail Is Online", type=discord.ActivityType.watching)
 	offline = False
+	await client.change_presence(activity=activity)
 
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
 async def clear_react(message):#function to reset reactions
@@ -101,7 +103,6 @@ async def on_message(message):
 	elif (await AsyncDataBase.read("UserInputMode", message.author.id) == 1):
 		# if its the send command the get the server, remove the \n that was left at the end from the conjoining of all the users messages and embed/send it
 		if message.content.lower() == "&send":
-			_ = await AsyncDataBase.read("User_Messages", message.author.id)
 			await Send(client, category, categoryIds, message, time)
 			return
 
