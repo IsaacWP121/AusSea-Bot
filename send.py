@@ -21,8 +21,13 @@ async def Send(client, category, categoryIds, message, time):
         channel = guild.get_channel(categoryIds[category]) #gets the proper channel it should be sending to
         if await AsyncDataBase.read("ModCategory", message.author.id) == 1:
             msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
-            message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":"<@&713704594718457897>","name":"____________"},{"value":'"{}"'.format(userMessage), 
+            message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":"<@&713704594718457897> - Harassment","name":"____________"},{"value":'"{}"'.format(userMessage), 
             "name":"message"}, {"value":"Use the eyes to show the user that their message has been seen\n\nUse the red cross to mark the request as closed\n\nUse the 'no entry sign' emoji to blacklist the user", 
+            "name":"Reactions"}]))
+        elif await AsyncDataBase.read("ModCategory", message.author.id) == 2:
+            msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
+            message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":"<@&742691006943854682> - NSFW","name":"____________"},{"value":'"{}"'.format(userMessage), 
+            "name":"Message"}, {"value":"Use the eyes to show the user that their message has been seen\n\nUse the red cross to mark the request as closed\n\nUse the 'no entry sign' emoji to blacklist the user", 
             "name":"Reactions"}]))
         else:
             msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
