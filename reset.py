@@ -5,10 +5,14 @@ async def reset(user):
     except:
         print("Error with removing from Category reset.py")
     try:    
-        await AsyncDataBase.remove("User_Messages", user.id)
+        await AsyncDataBase.remove("ModCategory", user.id)
     except:
-        print("Error with removing from User_Messages reset.py")
+        print("Error removing from ModCategory reset.py")
     try:    
-        await AsyncDataBase.remove("UserInputMode", user.id)
+        await AsyncDataBase.remove("selectionModMode", user.id)
+    except:
+        print("Error removing from ModCategory reset.py")
+    try:    
+        await AsyncDataBase.remove("selectionModMode", user.id)
     except:
         print("Error with removing from UserInputMode reset.py")

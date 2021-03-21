@@ -156,37 +156,61 @@ async def on_reaction_add(reaction, user):
 			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Categories", "", 
 				fields=[{"value":"What category would you place your request under?\n\n"+one+" Moderation\n\n"+two+" Tournaments\n\n"+three+" Mentoring\n\n"+four+" Other", 
 				"name":"____________"}], avatar=False))
-			await msg.add_reaction(one) #add the reactions to the bot so that the user can select a bot
+			await msg.add_reaction(one) #add the reactions to the bot so that the user can select a channel
 			await msg.add_reaction(two)
 			await msg.add_reaction(three)
 			await msg.add_reaction(four)
 			
 		# when a message has the "one" emoji added
 		elif (reaction.emoji == one):
-			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
-			await AsyncDataBase.addEntry("Category", user.id, CAT=1)
-			await clear_react(reaction.message)
-			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
+			if await AsyncDataBase.read("selectionModMode", user.id):
+				await AsyncDataBase.addEntry("ModCategory", user.id, CAT=1)
+				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+				msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
+			else:
+				await AsyncDataBase.addEntry("Category", user.id, CAT=1)
+				await AsyncDataBase.addEntry("selectionModMode", user.id, BOOL=True)
+				await clear_react(reaction.message)
+				msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "More Info", "", 
+				fields=[{"value":"What sort of moderation issue is it? Giving us this information helps us provide better support\n\n"+one+" Harassment\n\n"+two+" NSFW\n\n"+three+" Spam\n\n"+four+" Scamming ", "name":"____________"}], avatar=False))
+				await msg.add_reaction(one) #add the reactions to the bot so that the user can select a sub category		
+				await msg.add_reaction(two)
+				await msg.add_reaction(three)
+				await msg.add_reaction(four)
 
 		# when a message has the "two" emoji added		
 		elif (reaction.emoji == two):
-			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
-			await AsyncDataBase.addEntry("Category", user.id, CAT=2)
-			await clear_react(reaction.message)
-			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
+			if await AsyncDataBase.read("selectionModMode", user.id):
+				await AsyncDataBase.addEntry("ModCategory", user.id, CAT=2)
+				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+				msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
+			else:
+				await AsyncDataBase.addEntry("Category", user.id, CAT=2)
+				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+				await clear_react(reaction.message)
+				msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
+					fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
+					"name":"____________"}], avatar=False))
 						
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == three):
-			await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
-			await AsyncDataBase.addEntry("Category", user.id, CAT=3)
-			await clear_react(reaction.message)
-			msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
+			if await AsyncDataBase.read("selectionModMode", user.id):
+				await AsyncDataBase.addEntry("ModCategory", user.id, CAT=3)
+				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+				msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
+			else:
+				await AsyncDataBase.addEntry("Category", user.id, CAT=3)
+				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+				await clear_react(reaction.message)
+				msg = await reaction.message.channel.send(embed=await embed(reaction.message.author, "Your Message", "", 
+					fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
+					"name":"____________"}], avatar=False))
 			
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == four):

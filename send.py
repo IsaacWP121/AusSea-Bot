@@ -19,10 +19,16 @@ async def Send(client, category, categoryIds, message, time):
         if len(userMessage) == 200:
             return True
         channel = guild.get_channel(categoryIds[category]) #gets the proper channel it should be sending to
-        msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
-            message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":'"{}"'.format(userMessage), 
+        if await AsyncDataBase.read("ModCategory", message.author.id) == 1:
+            msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
+            message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":"<@&713704594718457897>","name":"____________"},{"value":'"{}"'.format(userMessage), 
             "name":"message"}, {"value":"Use the eyes to show the user that their message has been seen\n\nUse the red cross to mark the request as closed\n\nUse the 'no entry sign' emoji to blacklist the user", 
-            "name":"Reactions"}])) #creates a embed (with multiple dicts in the field arg to create multiple text fields)
+            "name":"Reactions"}]))
+        else:
+            msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
+                message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":'"{}"'.format(userMessage), 
+                "name":"message"}, {"value":"Use the eyes to show the user that their message has been seen\n\nUse the red cross to mark the request as closed\n\nUse the 'no entry sign' emoji to blacklist the user", 
+                "name":"Reactions"}])) #creates a embed (with multiple dicts in the field arg to create multiple text fields)
         await msg.add_reaction(eyes) #add reactions
         await msg.add_reaction(redCross)
         await msg.add_reaction(noEntrySign)
@@ -31,5 +37,3 @@ async def Send(client, category, categoryIds, message, time):
         await AsyncDataBase.remove( "User_Messages", 786320320276856872) #resets the variables
         await reset(message.author)
         return
-                    
-                    
