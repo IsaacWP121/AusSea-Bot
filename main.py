@@ -49,5 +49,6 @@ async def on_member_join(member):
 	await channel.send("Hi <@{}>, welcome to Aus SEA Brawlhalla! Please checkout <#{}> and go <#{}>, enjoy your stay!\n<:{}:{}>".format(
 		member.id, 231799301410390017, 455290609800839178, "AusSEAWave", 752031381613183028))
 
+
 if __name__ == "__main__":
 	client.run(Token.token())
