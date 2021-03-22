@@ -1,27 +1,22 @@
-import discord, AsyncDataBase,reset, Token, reaction_code, message_code #imports
+import discord, AsyncDataBase, Token, reaction_code, message_code, randomstatus #imports
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import utc
 from string import digits
 from discord.ext import commands
 
 client = commands.Bot(command_prefix = "&", self_bot=False, intents=discord.Intents.all()) #initializing client
-activity = discord.Activity(name="Jason get banned", type=discord.ActivityType.watching)
+activity = discord.Activity(name=randomstatus.randomstatus(), type=discord.ActivityType.watching)
 scheduler = AsyncIOScheduler(timezone=utc)
-#declarations
-offline = False
-
 
 async def offline_mode_on():
-	global offline
 	activity = discord.Activity(name="Mod Mail Is Offline", type=discord.ActivityType.watching)
-	offline = True
+	await AsyncDataBase.update("Offline", 1, BOOL=False)
 	await client.change_presence(activity=activity)
 
 
 async def offline_mode_off():
-	global offline
 	activity = discord.Activity(name="Mod Mail Is Online", type=discord.ActivityType.watching)
-	offline = False
+	await AsyncDataBase.update("Offline", 1, BOOL=False)
 	await client.change_presence(activity=activity)
 
 
@@ -30,6 +25,7 @@ async def offline_mode_off():
 async def on_ready():
 	print("{} is ready".format(client.user))
 	await AsyncDataBase.create()
+	await AsyncDataBase.addEntry("Offline", 1, BOOL=False)
 	await client.change_presence(activity=activity)
 	scheduler.add_job(lambda:offline_mode_on(), "cron", hour="11")
 	scheduler.add_job(lambda:offline_mode_off(), "cron", hour="13")
@@ -38,13 +34,12 @@ async def on_ready():
 
 @client.event #decorating this function as an event
 async def on_message(message):
-	global time
-	message_code.on_message(message, client)
+	await message_code.on_message(message, client)
 
 
 @client.event
 async def on_reaction_add(reaction, user):
-		reaction_code.on_react(reaction, user, client)
+	await reaction_code.on_react(reaction, user, client)
 
 
 @client.event

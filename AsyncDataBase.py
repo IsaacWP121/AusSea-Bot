@@ -15,6 +15,7 @@ async def create():
         (ID INT, Category INT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS ModCategory
         (ID INT, Category INT);''')
+        await c.execute('''CREATE TABLE IF NOT EXISTS Offline (ID INT, Status BOOL);''')
         await conn.commit()
     except Error as e:
         print(e)
@@ -37,6 +38,8 @@ async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
             await c.execute("INSERT INTO Category(ID, Category) VALUES(?, ?)", (ID, CAT))
         if Table == "ModCategory":
             await c.execute("INSERT INTO ModCategory(ID, Category) VALUES(?, ?)", (ID, CAT))
+        if Table == "Offline":
+            await c.execute("INSERT INTO Offline (ID, Status) VALUES (?, ?)", (ID, BOOL))
         print("data has been inputted into {}".format(Table))
         await conn.commit()
 
@@ -89,6 +92,8 @@ async def read(Table, ID):
             await c.execute("SELECT * FROM Category WHERE ID=?", (ID,))
         if Table == "ModCategory":
             await c.execute("SELECT * FROM ModCategory WHERE ID=?", (ID,))
+        if Table == "Offline":
+            await c.execute("SELECT * FROM Offline WHERE ID=?", (ID))
         rd = await c.fetchall()
         await conn.commit()
         
@@ -115,6 +120,8 @@ async def update(Table, ID, Message=None, BOOL=None):
             await c.execute('''UPDATE UserInputMode SET OnOff = ? WHERE ID = ?''', (BOOL, ID))
         if Table == "selectionModMode":
             await c.execute('''UPDATE selectionModMode SET OnOff = ? WHERE ID = ?''', (BOOL, ID))
+        if Table == "Offline":
+            await c.execute('''UPDATE Offline SET Status = ? WHERE ID = ?''', (BOOL, ID))
         await conn.commit()
     except Error as e:
         print(e)
