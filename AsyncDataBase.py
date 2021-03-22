@@ -24,6 +24,7 @@ async def create():
         if conn:
             await conn.close()
 
+
 async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
     try:
         conn = await aiosqlite.connect("data.db")
@@ -49,6 +50,7 @@ async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
     finally:
         if conn:
             await conn.close()
+
 
 async def readall(Table):
     rd = None
@@ -76,6 +78,7 @@ async def readall(Table):
                 return False
             else:
                 return rd
+
 
 async def read(Table, ID):
     rd = None
@@ -111,7 +114,8 @@ async def read(Table, ID):
                     return rd[0][1]
                 except:
                     return rd[0][0]
-#Values is equal to message and id
+
+
 async def update(Table, ID, Message=None, BOOL=None):
     try:
         conn = await aiosqlite.connect("data.db")
@@ -129,6 +133,7 @@ async def update(Table, ID, Message=None, BOOL=None):
     finally:
         if conn:
             await conn.close()
+
 
 async def remove(Table, ID):
     try:

@@ -3,9 +3,12 @@ tick = "✅"
 time = None
 category = 0
 categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
+
+
 async def on_message(message, client):
 	if message.author == client.user:
 		return
+
 
 	elif not isinstance(message.channel, discord.channel.DMChannel):
 		try:
@@ -17,8 +20,10 @@ async def on_message(message, client):
 			return
 		return
 
+
 	elif (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
+
 
 	elif offline:
 		msg = await message.channel.send(embed = await embed.embed(message.author, "Hey!", "", fields=

@@ -8,17 +8,22 @@ time = None
 eyes = u"\U0001F440"
 noEntrySign = u"\U0001F6AB"
 redCross = 	u"\u274C"
+
+
 def check(c):
 	try:
 		int(c)
 		return True
 	except ValueError:
 		return False
+
+
 #this is to make sure the user cant add a second reaction and screw the bot over, it'll be called after the user chooses a reaction
 async def clear_react(message, client):#function to reset reactions
 	lis = [one, two, three, four]
 	for i in lis:
 		await message.remove_reaction(i, client.user) #cant remove all due to not being able to remove the users
+
 
 async def on_reaction(reaction, user, client):
 # if the user is the bot
@@ -34,6 +39,7 @@ async def on_reaction(reaction, user, client):
 			fields=[{"value":"Your message has been seen by <@{}>, they will dm you shortly".format(user.id), "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(eyes) #makes it so that the staff cant send multiple "seen" messages 
 
+
 		if (reaction.emoji == redCross):
 			await client.get_user(int(
 				''.join(c for c in reaction.message.embeds[0].description if check(c)))
@@ -41,12 +47,14 @@ async def on_reaction(reaction, user, client):
 			fields=[{"value":"Your ticket has been closed by a staff member, hope we helped!", "name":"____________"}], avatar=False))
 			await reaction.message.clear_reaction(redCross)
 		
+
 		if (reaction.emoji == noEntrySign):
 			if not (await AsyncDataBase.read("Blacklist", reaction.message.id)):
 				await Blacklist.Blacklist(reaction.message, client, int(''.join(c for c in reaction.message.embeds[0].description if check(c))))
 				await reaction.message.clear_reaction(noEntrySign)
 			USER_ID = int(''.join(c for c in reaction.message.embeds[0].description if check(c)))
 			await AsyncDataBase.addEntry("Blacklist", USER_ID)
+		
 		# if the channel is not a dm, return
 		if not isinstance(reaction.message.channel, discord.channel.DMChannel):
 			return
