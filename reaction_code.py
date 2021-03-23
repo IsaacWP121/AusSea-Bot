@@ -4,6 +4,8 @@ one = "1⃣"
 two = "2⃣"
 three ="3⃣"
 four = "4⃣"
+five = "5⃣"
+six = "6⃣"
 time = None
 eyes = u"\U0001F440"
 noEntrySign = u"\U0001F6AB"
@@ -25,7 +27,7 @@ async def clear_react(message, client):#function to reset reactions
 		await message.remove_reaction(i, client.user) #cant remove all due to not being able to remove the users
 
 
-async def on_reaction(reaction, user, client):
+async def on_react(reaction, user, client):
 # if the user is the bot
 		if (user == client.user):
 			return
@@ -82,11 +84,13 @@ async def on_reaction(reaction, user, client):
 				await AsyncDataBase.addEntry("selectionModMode", user.id, BOOL=True)
 				await clear_react(reaction.message, client)
 				msg = await reaction.message.channel.send(embed=await embed.embed(reaction.message.author, "More Info", "", 
-				fields=[{"value":"What sort of moderation issue is it? Giving us this information helps us provide better support\n\n"+one+" Harassment\n\n"+two+" NSFW\n\n"+three+" Spam\n\n"+four+" Scamming ", "name":"____________"}], avatar=False))
+				fields=[{"value":"What sort of moderation issue is it? Giving us this information helps us provide better support\n\n"+one+" Harassment\n\n"+two+" NSFW\n\n"+three+" Spam\n\n"+four+" Scamming (includes selling codes)\n\n"+five+" Boosting\n\n"+six+" Submitting an Appeal", "name":"____________"}], avatar=False))
 				await msg.add_reaction(one) #add the reactions to the bot so that the user can select a sub category		
 				await msg.add_reaction(two)
 				await msg.add_reaction(three)
 				await msg.add_reaction(four)
+				await msg.add_reaction(five)
+				await msg.add_reaction(six)
 
 		# when a message has the "two" emoji added		
 		elif (reaction.emoji == two):
@@ -135,3 +139,25 @@ async def on_reaction(reaction, user, client):
 				msg = await reaction.message.channel.send(embed=await embed.embed(reaction.message.author, "Your Message", "", 
 					fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 					"name":"____________"}], avatar=False))
+
+
+		elif (reaction.emoji == five):
+			if await AsyncDataBase.read("selectionModMode", user.id):
+				await AsyncDataBase.addEntry("ModCategory", user.id, CAT=5)
+				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+				msg = await reaction.message.channel.send(embed=await embed.embed(reaction.message.author, "Your Message", "", 
+				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
+				"name":"____________"}], avatar=False))
+			else:
+				pass
+		
+
+		elif (reaction.emoji == six):
+			if await AsyncDataBase.read("selectionModMode", user.id):
+				await AsyncDataBase.addEntry("ModCategory", user.id, CAT=6)
+				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+				msg = await reaction.message.channel.send(embed=await embed.embed(reaction.message.author, "Your Message", "", 
+				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
+				"name":"____________"}], avatar=False))
+			else:
+				pass

@@ -6,6 +6,7 @@ categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429,
 
 
 async def on_message(message, client):
+	global time
 	if message.author == client.user:
 		return
 
@@ -25,7 +26,7 @@ async def on_message(message, client):
 		return
 
 
-	elif offline:
+	elif (await AsyncDataBase.read("Offline", 1)) == 1 or (await AsyncDataBase.read("Offline", 1)) == True:
 		msg = await message.channel.send(embed = await embed.embed(message.author, "Hey!", "", fields=
 				[{"value":"Hi there! The mod mail functions are temporarily disabled in order to make sure our staff get a bit of a break. Message us back in {} hours and we'll help you out then!".format("?"), "name":"____________"}],
 				avatar=False))

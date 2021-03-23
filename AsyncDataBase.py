@@ -15,6 +15,8 @@ async def create():
         (ID INT, Category INT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS ModCategory
         (ID INT, Category INT);''')
+        await c.execute('''CREATE TABLE IF NOT EXISTS mentorSelect
+        (ID INT, Category INT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS Offline (ID INT, Status BOOL);''')
         await conn.commit()
     except Error as e:
@@ -39,6 +41,8 @@ async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
             await c.execute("INSERT INTO Category(ID, Category) VALUES(?, ?)", (ID, CAT))
         if Table == "ModCategory":
             await c.execute("INSERT INTO ModCategory(ID, Category) VALUES(?, ?)", (ID, CAT))
+        if Table == "mentorSelect":
+            await c.execute("INSERT INTO mentorSelect(ID, Category) VALUES(?, ?)", (ID, CAT))
         if Table == "Offline":
             await c.execute("INSERT INTO Offline (ID, Status) VALUES (?, ?)", (ID, BOOL))
         print("data has been inputted into {}".format(Table))
@@ -95,6 +99,8 @@ async def read(Table, ID):
             await c.execute("SELECT * FROM Category WHERE ID=?", (ID,))
         if Table == "ModCategory":
             await c.execute("SELECT * FROM ModCategory WHERE ID=?", (ID,))
+        if Table == "mentorSelect":
+            await c.execute("SELECT * FROM mentorSelect WHERE ID=?", (ID,))
         if Table == "Offline":
             await c.execute("SELECT * FROM Offline WHERE ID=?", (ID))
         rd = await c.fetchall()
@@ -135,6 +141,26 @@ async def update(Table, ID, Message=None, BOOL=None):
             await conn.close()
 
 
+async def removeall():
+    try:
+        conn = await aiosqlite.connect("data.db")
+        c = await conn.cursor()
+        await c.execute("DELETE FROM UserInputMode")
+        await c.execute("DELETE FROM selectionModMode")
+        await c.execute("DELETE FROM Category")
+        await c.execute("DELETE FROM ModCategory")
+        await c.execute("DELETE FROM mentorSelect")
+        await c.execute("DELETE FROM Offline")
+        await conn.commit()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        if conn:
+            await conn.close()
+
+
 async def remove(Table, ID):
     try:
         conn = await aiosqlite.connect("data.db")
@@ -149,6 +175,8 @@ async def remove(Table, ID):
             await c.execute("DELETE FROM Category WHERE ID = ?", (ID,))
         if Table == "ModCategory":
             await c.execute("DELETE FROM ModCategory WHERE ID = ?", (ID,))
+        if Table == "mentorSelect":
+            await c.execute("DELETE FROM mentorSelect WHERE ID = ?", (ID,))
         await conn.commit()
 
     except Error as e:

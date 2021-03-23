@@ -1,4 +1,4 @@
-import discord, AsyncDataBase, Token, reaction_code, message_code, randomstatus #imports
+import discord, AsyncDataBase, Token, reaction_code, message_code, randomstatus, reset #imports
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import utc
 from string import digits
@@ -10,7 +10,7 @@ scheduler = AsyncIOScheduler(timezone=utc)
 
 async def offline_mode_on():
 	activity = discord.Activity(name="Mod Mail Is Offline", type=discord.ActivityType.watching)
-	await AsyncDataBase.update("Offline", 1, BOOL=False)
+	await AsyncDataBase.update("Offline", 1, BOOL=True)
 	await client.change_presence(activity=activity)
 
 
@@ -24,11 +24,12 @@ async def offline_mode_off():
 @client.event
 async def on_ready():
 	print("{} is ready".format(client.user))
+	await AsyncDataBase.removeall()
 	await AsyncDataBase.create()
 	await AsyncDataBase.addEntry("Offline", 1, BOOL=False)
 	await client.change_presence(activity=activity)
-	scheduler.add_job(lambda:offline_mode_on(), "cron", hour="11")
-	scheduler.add_job(lambda:offline_mode_off(), "cron", hour="13")
+	scheduler.add_job(offline_mode_on, "cron", hour="13", minute="34")
+	scheduler.add_job(offline_mode_off, "cron", hour="13")
 	scheduler.start()
 
 
