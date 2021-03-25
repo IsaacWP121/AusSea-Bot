@@ -73,9 +73,16 @@ async def on_react(reaction, user, client):
 			
 		# when a message has the "one" emoji added
 		elif (reaction.emoji == one):
+			print(await AsyncDataBase.read("mentorSelect", user.id))
 			if await AsyncDataBase.read("selectionModMode", user.id):
 				await AsyncDataBase.addEntry("ModCategory", user.id, CAT=1)
 				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+				msg = await reaction.message.channel.send(embed=await embed.embed(reaction.message.author, "Your Message", "", 
+				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
+				"name":"____________"}], avatar=False))
+			elif await AsyncDataBase.read("mentorSelect", user.id):
+				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
+				await clear_react(reaction.message, client)
 				msg = await reaction.message.channel.send(embed=await embed.embed(reaction.message.author, "Your Message", "", 
 				fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
 				"name":"____________"}], avatar=False))
@@ -118,11 +125,12 @@ async def on_react(reaction, user, client):
 				"name":"____________"}], avatar=False))
 			else:
 				await AsyncDataBase.addEntry("Category", user.id, CAT=3)
-				await AsyncDataBase.addEntry("UserInputMode", user.id, BOOL=True)
-				await clear_react(reaction.message, client)
-				msg = await reaction.message.channel.send(embed=await embed.embed(reaction.message.author, "Your Message", "", 
-					fields=[{"value":"Please type your message below and use &send to submit your message to the staff", 
-					"name":"____________"}], avatar=False))
+				await AsyncDataBase.addEntry("mentorSelect", user.id, CAT = None, BOOL=True)
+				msg = await reaction.message.channel.send(embed=await embed.embed(reaction.message.author, "More Info", "", 
+				fields=[{"value":"What sort of mentoring issue is it? Do you want help finding a mentor or did you have an issue with a mentor?\n\n"+one+" Help finding mentor\n\n"+two+" Issue with mentor\n\n", "name":"____________"}], avatar=False))
+				await msg.add_reaction(one) #add the reactions to the bot so that the user can select a sub category		
+				await msg.add_reaction(two)
+				
 			
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == four):

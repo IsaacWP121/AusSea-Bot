@@ -16,7 +16,7 @@ async def create():
         await c.execute('''CREATE TABLE IF NOT EXISTS ModCategory
         (ID INT, Category INT);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS mentorSelect
-        (ID INT, Category INT);''')
+        (ID INT, Category BLOB, Status BOOL);''')
         await c.execute('''CREATE TABLE IF NOT EXISTS Offline (ID INT, Status BOOL);''')
         await conn.commit()
     except Error as e:
@@ -42,7 +42,7 @@ async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
         if Table == "ModCategory":
             await c.execute("INSERT INTO ModCategory(ID, Category) VALUES(?, ?)", (ID, CAT))
         if Table == "mentorSelect":
-            await c.execute("INSERT INTO mentorSelect(ID, Category) VALUES(?, ?)", (ID, CAT))
+            await c.execute("INSERT INTO mentorSelect(ID, Category, Status) VALUES(?, ?, ?)", (ID, CAT, BOOL))
         if Table == "Offline":
             await c.execute("INSERT INTO Offline (ID, Status) VALUES (?, ?)", (ID, BOOL))
         print("data has been inputted into {}".format(Table))
@@ -84,7 +84,7 @@ async def readall(Table):
                 return rd
 
 
-async def read(Table, ID):
+async def read(Table, ID, rv = 2):
     rd = None
     try:
         conn = await aiosqlite.connect("data.db")
@@ -116,13 +116,15 @@ async def read(Table, ID):
             if rd == None or rd == [] or rd == "":
                 return False
             else:
+                if Table == "mentorSelect":
+                    return rd[0][rv]
                 try:
                     return rd[0][1]
                 except:
                     return rd[0][0]
 
 
-async def update(Table, ID, Message=None, BOOL=None):
+async def update(Table, ID, CAT=None, BOOL=None):
     try:
         conn = await aiosqlite.connect("data.db")
         c = await conn.cursor()
@@ -130,6 +132,8 @@ async def update(Table, ID, Message=None, BOOL=None):
             await c.execute('''UPDATE UserInputMode SET OnOff = ? WHERE ID = ?''', (BOOL, ID))
         if Table == "selectionModMode":
             await c.execute('''UPDATE selectionModMode SET OnOff = ? WHERE ID = ?''', (BOOL, ID))
+        if Table == "mentorSelect":
+            await c.execute('''UPDATE mentorSelect SET CAT = ? WHERE ID = ?''', (CAT, ID))
         if Table == "Offline":
             await c.execute('''UPDATE Offline SET Status = ? WHERE ID = ?''', (BOOL, ID))
         await conn.commit()
