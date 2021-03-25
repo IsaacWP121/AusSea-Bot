@@ -44,7 +44,7 @@ async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
         if Table == "mentorSelect":
             await c.execute("INSERT INTO mentorSelect(ID, Category, Status) VALUES(?, ?, ?)", (ID, CAT, BOOL))
         if Table == "Offline":
-            await c.execute("INSERT INTO Offline (ID, Status) VALUES (?, ?)", (ID, BOOL))
+            await c.execute("INSERT INTO Offline (ID, Status) VALUES (1, ?)", (BOOL,))
         print("data has been inputted into {}".format(Table))
         await conn.commit()
 
@@ -102,7 +102,7 @@ async def read(Table, ID, rv = 2):
         if Table == "mentorSelect":
             await c.execute("SELECT * FROM mentorSelect WHERE ID=?", (ID,))
         if Table == "Offline":
-            await c.execute("SELECT * FROM Offline WHERE ID=?", (ID))
+            await c.execute("SELECT * FROM Offline WHERE ID=1")
         rd = await c.fetchall()
         await conn.commit()
         
@@ -135,7 +135,7 @@ async def update(Table, ID, CAT=None, BOOL=None):
         if Table == "mentorSelect":
             await c.execute('''UPDATE mentorSelect SET CAT = ? WHERE ID = ?''', (CAT, ID))
         if Table == "Offline":
-            await c.execute('''UPDATE Offline SET Status = ? WHERE ID = ?''', (BOOL, ID))
+            await c.execute('''UPDATE Offline SET Status = ? WHERE ID = 1''', (BOOL,))
         await conn.commit()
     except Error as e:
         print(e)

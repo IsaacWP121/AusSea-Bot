@@ -28,7 +28,7 @@ async def on_ready():
 	await AsyncDataBase.create()
 	await AsyncDataBase.addEntry("Offline", 1, BOOL=False)
 	await client.change_presence(activity=activity)
-	scheduler.add_job(offline_mode_on, "cron", hour="13", minute="34")
+	scheduler.add_job(offline_mode_on, "cron", hour="7", minute="47")
 	scheduler.add_job(offline_mode_off, "cron", hour="13")
 	scheduler.start()
 

@@ -11,7 +11,7 @@ async def on_message(message, client):
 		return
 
 
-	elif not isinstance(message.channel, discord.channel.DMChannel):
+	if not isinstance(message.channel, discord.channel.DMChannel):
 		try:
 			if message.content.split()[0].lower() == "&blacklist":
 				await Blacklist.Blacklist(message)
@@ -22,19 +22,20 @@ async def on_message(message, client):
 		return
 
 
-	elif (await AsyncDataBase.read("Blacklist", message.author.id)):
+	if (await AsyncDataBase.read("Blacklist", message.author.id)):
 		return
 
 
-	elif (await AsyncDataBase.read("Offline", 1)) == 1 or (await AsyncDataBase.read("Offline", 1)) == True:
+	if (await AsyncDataBase.read("Offline", 1)) == 1:
 		msg = await message.channel.send(embed = await embed.embed(message.author, "Hey!", "", fields=
 				[{"value":"Hi there! The mod mail functions are temporarily disabled in order to make sure our staff get a bit of a break. Message us back in {} hours and we'll help you out then!".format("?"), "name":"____________"}],
 				avatar=False))
 		return
 
 	# if its the cancel command reset the bots state
-	elif ("&cancel" == message.content.lower()):
+	if ("&cancel" == message.content.lower()):
 		await reset.reset(message.author)
+		return
 	
 	#if the message variable is not the bot
 	elif (await AsyncDataBase.read("UserInputMode", message.author.id) != 1):
