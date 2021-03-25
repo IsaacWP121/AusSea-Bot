@@ -134,8 +134,7 @@ async def on_react(reaction, user, client):
 				fields=[{"value":"What sort of mentoring issue is it? Do you want help finding a mentor or did you have an issue with a mentor?\n\n"+one+" Issue with mentor\n\n"+two+" Help finding mentor\n\n", "name":"____________"}], avatar=False))
 				await msg.add_reaction(one) #add the reactions to the bot so that the user can select a sub category		
 				await msg.add_reaction(two)
-				
-			
+							
 		# when a message has the "three" emoji added
 		elif (reaction.emoji == four):
 			if await AsyncDataBase.read("selectionModMode", user.id):
