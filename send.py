@@ -30,10 +30,18 @@ async def Send(client, category, categoryIds, message, time):
 
 
     if category != 0:
-
-        if len(userMessage) == 200:
-            return True
-
+        if len (userMessage) == 0:
+            msg = await message.channel.send(embed=await embed(message.author, "Categories", "", 
+				fields=[{"value":"Too few characters. I guess you got no issue then", 
+				"name":"____________"}], avatar=False))
+            await reset.reset(message.author)
+            return
+        if len(userMessage) >= 1024:
+            msg = await message.channel.send(embed=await embed(message.author, "Categories", "", 
+				fields=[{"value":"Too many characters. Try not to send too much information with the first message, staff will follow up and ask for more information if necessary", 
+				"name":"____________"}], avatar=False))
+            await reset.reset(message.author)
+            return
         channel = guild.get_channel(categoryIds[category]) #gets the proper channel it should be sending to
         msg = await channel.send(embed=await embed(message.author,"{}#{}".format(message.author.name, 
                 message.author.discriminator),"<@{}>".format(message.author.id),fields=[{"value":'"{}"'.format(userMessage), 
