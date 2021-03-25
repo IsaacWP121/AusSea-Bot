@@ -5,6 +5,22 @@ category = 0
 categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
 
 
+def time_until_logic():
+	x = datetime.datetime.utcnow()
+	return_value = ""
+	if x.minute == 0:
+		hours_until = 14-x.hour
+		return_value = str(hours_until) + " hours"
+	else:
+		hours_until = 13-x.hour
+		min_until = 60-x.minute
+		if hours_until == 0:
+			return_value = str(min_until) + " minutes"
+		else:
+			return_value = str(hours_until) + " hours and " + str(min_until) + " minutes"
+	return return_value
+
+
 async def on_message(message, client):
 	global time
 	if message.author == client.user:
@@ -28,7 +44,7 @@ async def on_message(message, client):
 
 	if (await AsyncDataBase.read("Offline", 1)) == 1:
 		msg = await message.channel.send(embed = await embed.embed(message.author, "Hey!", "", fields=
-				[{"value":"Hi there! The mod mail functions are temporarily disabled in order to make sure our staff get a bit of a break. Message us back in {} hours and we'll help you out then!".format("?"), "name":"____________"}],
+				[{"value":"Hi there! The mod mail functions are temporarily disabled in order to make sure our staff get a bit of a break. Message us back in {}. We'll help you out then!".format(time_until_logic()), "name":"____________"}],
 				avatar=False))
 		return
 
