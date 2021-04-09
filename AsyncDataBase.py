@@ -146,7 +146,7 @@ async def update(Table, ID, CAT=None, BOOL=None):
 
 
 async def removeall():
-    conn = await aiosqlite.connect("data.db")
+    conn = await aiosqlite.connect("data.db") 
     try:
         c = await conn.cursor()
         await c.execute("DELETE FROM UserInputMode")

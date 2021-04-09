@@ -28,11 +28,21 @@ async def on_message(message, client):
 
 
 	if not isinstance(message.channel, discord.channel.DMChannel):
+		role = []
+		role.append(discord.utils.find(lambda r: r.name == 'Admin', message.guild.roles))
+		role.append(discord.utils.find(lambda r: r.name == 'Bot Dev', message.guild.roles))
+		if message.guild.id == 713704403567378473:
+			role.append(discord.utils.find(lambda r: r.name == 'Helpers', message.guild.roles))
+			role.append(discord.utils.find(lambda r: r.name == 'Mods', message.guild.roles))
+		elif message.guild.id == 179077200149086209:
+			role.append(discord.utils.find(lambda r: r.name == 'Helper', message.guild.roles))
+			role.append(discord.utils.find(lambda r: r.name == 'Mod', message.guild.roles))
 		try:
-			if message.content.split()[0].lower() == "&blacklist":
-				await Blacklist.Blacklist(message)
-			elif message.content.split()[0].lower() == "&unblacklist":
-				await Unblacklist.Unblacklist(message)
+			for i in role:
+				if message.content.split()[0].lower() == "&blacklist" and role in message.author.roles:
+					await Blacklist.Blacklist(message)
+				elif message.content.split()[0].lower() == "&unblacklist":
+					await Unblacklist.Unblacklist(message)
 		except:
 			return
 		return
