@@ -1,4 +1,4 @@
-import discord, AsyncDataBase, Token, reaction_code, message_code, randomstatus, decouple #imports
+import discord, AsyncDataBase, reaction_code, message_code, randomstatus, decouple #imports
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import utc
 from string import digits

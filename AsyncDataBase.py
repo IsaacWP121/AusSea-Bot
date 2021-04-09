@@ -3,7 +3,7 @@ from aiosqlite import Error
 
 async def create():
     try:
-        conn = await aiosqlite.connect("data.db")
+        conn = await aiosqlite.connect("file::memory:?cache=shared")
         c = await conn.cursor()
         await c.execute('''CREATE TABLE IF NOT EXISTS Blacklist
          (ID INT);''')
@@ -29,7 +29,7 @@ async def create():
 
 async def addEntry(Table, ID, Message=None, BOOL=None, CAT=None):
     try:
-        conn = await aiosqlite.connect("data.db")
+        conn = await aiosqlite.connect("file::memory:?cache=shared")
         c = await conn.cursor()
         if Table == "Blacklist":
             await c.execute("INSERT INTO Blacklist (ID) VALUES (?)", (ID,))
@@ -60,7 +60,7 @@ async def readall(Table):
     rd = None
     
     try:
-        conn = await aiosqlite.connect("data.db")
+        conn = await aiosqlite.connect("file::memory:?cache=shared")
         c = await conn.cursor()
         if Table == "Blacklist":
             await c.execute("SELECT * FROM Blacklist")
@@ -87,7 +87,7 @@ async def readall(Table):
 async def read(Table, ID, rv = 2):
     rd = None
     try:
-        conn = await aiosqlite.connect("data.db")
+        conn = await aiosqlite.connect("file::memory:?cache=shared")
         c = await conn.cursor()
         if Table == "Blacklist":
             await c.execute("SELECT * FROM Blacklist WHERE ID=?", (ID,))
@@ -126,7 +126,7 @@ async def read(Table, ID, rv = 2):
 
 async def update(Table, ID, CAT=None, BOOL=None):
     try:
-        conn = await aiosqlite.connect("data.db")
+        conn = await aiosqlite.connect("file::memory:?cache=shared")
         c = await conn.cursor()
         if Table == "UserInputMode":
             await c.execute('''UPDATE UserInputMode SET OnOff = ? WHERE ID = ?''', (BOOL, ID))
@@ -147,7 +147,7 @@ async def update(Table, ID, CAT=None, BOOL=None):
 
 async def removeall():
     try:
-        conn = await aiosqlite.connect("data.db")
+        conn = await aiosqlite.connect("file::memory:?cache=shared")
         c = await conn.cursor()
         await c.execute("DELETE FROM UserInputMode")
         await c.execute("DELETE FROM selectionModMode")
@@ -167,7 +167,7 @@ async def removeall():
 
 async def remove(Table, ID):
     try:
-        conn = await aiosqlite.connect("data.db")
+        conn = await aiosqlite.connect("file::memory:?cache=shared")
         c = await conn.cursor()
         if Table == "Blacklist":
             await c.execute("DELETE FROM Blacklist WHERE ID = ?", (ID,))
