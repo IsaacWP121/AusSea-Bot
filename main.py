@@ -52,4 +52,4 @@ async def on_member_join(member):
 
 
 if __name__ == "__main__":
-	client.run(decouple.config("Token"))
+	client.run("NzkwMTE1MDE2MTU4MDg1MTMw.X9758w.60UndbO1UyUtVIBpnCg0FspNYfk")
