@@ -44,7 +44,7 @@ async def on_message(message, client):
 					await Unblacklist.Unblacklist(message)
 		except:
 			return
-		if message.author.id == 786320320276856872 and message.content.split()[0].lower() == "&Riddle1":
+		if message.author.id == 786320320276856872 and message.content.split()[0].lower() == "&riddle1":
 			guild = client.get_guild(179077200149086209)
 			channel = guild.get_channel(179079350296117248)
 			await channel.send("""***What occurs once in every minute, twice in every moment, yet never in a thousand years?***""")
