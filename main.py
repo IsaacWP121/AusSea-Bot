@@ -1,4 +1,4 @@
-import discord, AsyncDataBase, reaction_code, message_code, randomstatus, Token #imports
+import discord, AsyncDataBase, reaction_code, message_code, randomstatus, os, decouple#imports
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import utc
 from string import digits
@@ -52,4 +52,10 @@ async def on_member_join(member):
 
 
 if __name__ == "__main__":
-	client.run(Token.token())
+	try:
+		if decouple.config("Token") == None:
+			client.run(os.environ.get("Token"))
+		else:
+			client.run(decouple.config("Token"))
+	except:
+		client.run(os.environ.get("Token"))
