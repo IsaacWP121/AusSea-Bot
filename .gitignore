@@ -3,3 +3,4 @@ __pycache__
 data.db
 randomstatus.py
 Token.py
+.vscode
