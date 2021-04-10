@@ -52,6 +52,4 @@ async def on_member_join(member):
 
 
 if __name__ == "__main__":
-
-	print("test")
 	client.run(Token.token())
