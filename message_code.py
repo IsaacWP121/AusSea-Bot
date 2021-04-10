@@ -20,7 +20,6 @@ def time_until_logic():
 			return_value = str(hours_until) + " hours and " + str(min_until) + " minutes"
 	return return_value
 
-
 async def on_message(message, client):
 	global time
 	if message.author == client.user:
