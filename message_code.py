@@ -3,7 +3,7 @@ tick = "✅"
 time = None
 category = 0
 categoryIds = {1:750590527249973369, 2:750590465149239346, 3:750590556777873429, 4:750613194875076618}
-
+generalCategories = [179077200149086209, 799632295383531530]
 
 def time_until_logic():
 	x = datetime.datetime.utcnow()
@@ -45,14 +45,12 @@ async def on_message(message, client):
 					await Unblacklist.Unblacklist(message)
 		except:
 			return
+		if message.author.id == 234395307759108106 and message.channel.id() in generalCategories:
+			message.delete()
+			message.channel.send("This bot can not be used in this channel, try <#208821729944928256> instead")
 		if message.author.id == 786320320276856872 and message.content.split()[0].lower() == "&Riddle1":
 			guild = client.get_guild(179077200149086209)
 			channel = guild.get_channel(179079350296117248)
-			await channel.send("""***What occurs once in every minute, twice in every moment, yet never in a thousand years?***""")
-			await channel.send("""***I am something people love or hate. I change peoples appearances and thoughts. 
-			If a person takes care of them self I will go up even higher. To some people I will fool them. To others I
-			 am a mystery. Some people might want to try and hide me but I will show. No matter how hard people try I will Never go down. What am I?***""")
-			await channel.send("These two riddles make a key, send it to me through the 'other' category and if someone is right....")
 		return
 
 
