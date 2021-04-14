@@ -20,7 +20,6 @@ def time_until_logic():
 			return_value = str(hours_until) + " hours and " + str(min_until) + " minutes"
 	return return_value
 
-
 async def on_message(message, client):
 	global time
 	if message.author == client.user:
@@ -49,6 +48,7 @@ async def on_message(message, client):
 			message.delete()
 			message.channel.send("This bot can not be used in this channel, try <#208821729944928256> instead")
 		if message.author.id == 786320320276856872 and message.content.split()[0].lower() == "&Riddle1":
+
 			guild = client.get_guild(179077200149086209)
 			channel = guild.get_channel(179079350296117248)
 		return
